@@ -41,8 +41,6 @@ from sbank.tau0tau3 import proposals
 from sbank.psds import (noise_models, read_psd)
 from sbank.waveforms import waveforms, SnglInspiralTable
 
-import lal
-
 
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
