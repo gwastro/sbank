@@ -1,0 +1,76 @@
+include:
+  - project: computing/gitlab-ci-templates
+    file:
+      - /python/build.yml
+      - /python/lint.yml
+      - /python/test.yml
+
+stages:
+  - dist
+  - test
+  - lint
+
+# -- dist -------------------
+
+tarball:
+  extends:
+    - .python:dist
+  image: python:3
+  stage: dist
+
+# -- test -------------------
+
+.test:
+  extends:
+    - .python:pytest
+  variables:
+    GIT_STRATEGY: none
+  stage: test
+  image: python
+  needs:
+    - tarball
+  before_script:
+    # install package and its dependencies
+    - python -m pip install sbank-*.tar.gz
+    # install other dependencies (including those for testing)
+    - tar --wildcards --strip-components 1 -xf sbank-*.tar.gz */requirements.txt
+    - python -m pip install -r requirements.txt
+    # force numpy <1.20.0a0 for lalsuite <=6.81
+    - python -m pip install "numpy<1.20.0a0"
+  script:
+    # run command-line script(s)
+    - python -m coverage run
+          --append
+          --source=sbank
+          $(which lalapps_cbc_sbank) --help
+  after_script:
+    # print coverage report
+    - python -m coverage report
+    - python -m coverage xml -o coverage.xml
+
+test:python3.6:
+  extends:
+    - .test
+  image: python:3.6
+
+test:python3.7:
+  extends:
+    - .test
+  image: python:3.7
+
+test:python3.8:
+  extends:
+    - .test
+  image: python:3.8
+
+# -- lint -------------------
+
+.lint-stage:
+  stage: lint
+
+flake8:
+  extends:
+    - .python:flake8
+    - .lint-stage
+  needs: []
+  allow_failure: true
