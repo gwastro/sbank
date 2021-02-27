@@ -26,9 +26,9 @@ np.seterr(all="ignore")
 import lal
 import lalsimulation as lalsim
 from lal import MSUN_SI, MTSUN_SI, PC_SI, PI, CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
-from lalinspiral import InspiralSBankComputeMatch, InspiralSBankComputeRealMatch, InspiralSBankComputeMatchMaxSkyLoc, InspiralSBankComputeMatchMaxSkyLocNoPhase
-from sbank.psds import get_neighborhood_PSD, get_ASD
-from sbank.tau0tau3 import m1m2_to_tau0tau3
+from .overlap import SbankComputeMatchSkyLoc, SBankComputeMatch
+from .psds import get_neighborhood_PSD, get_ASD
+from .tau0tau3 import m1m2_to_tau0tau3
 
 # I wanted to use lalmetaio here, but the class has issues with python as the
 # LALGPSTime class is different (ie. no end_time_ns but
@@ -404,7 +404,9 @@ class AlignedSpinTemplate(object):
         raise NotImplementedError
 
     def brute_match(self, other, df, workspace_cache, **kwargs):
-        return InspiralSBankComputeMatch(self.get_whitened_normalized(df, **kwargs), other.get_whitened_normalized(df, **kwargs), workspace_cache[0])
+        return SBankComputeMatch(self.get_whitened_normalized(df, **kwargs),
+                                 other.get_whitened_normalized(df, **kwargs),
+                                 workspace_cache[0])
 
     def clear(self):
         self._wf = {}
@@ -724,9 +726,10 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
         proposal = other.get_whitened_normalized(df, **kwargs)
 
         # maximize over sky position of template
-        return InspiralSBankComputeMatchMaxSkyLoc(hp, hc, hphccorr,
-                                                  proposal, workspace_cache[0],
-                                                  workspace_cache[1])
+        return SBankComputeMatchMaxSkyLoc(hp, hc, hphccorr,
+                                          proposal, workspace_cache[0],
+                                          workspace_cache[1],
+                                          phase_maximized=True)
 
     @classmethod
     def from_sngl(cls, sngl, bank):
@@ -914,10 +917,11 @@ class HigherOrderModeTemplate(PrecessingSpinTemplate):
 
 
         # maximize over sky position of template
-        return InspiralSBankComputeMatchMaxSkyLocNoPhase(hp, hc,
-                                                         hphccorr, proposal,
-                                                         workspace_cache[0],
-                                                         workspace_cache[1])
+        return SBankComputeMatchMaxSkyLoc(hp, hc,
+                                          hphccorr, proposal,
+                                          workspace_cache[0],
+                                          workspace_cache[1],
+                                          phase_maximized=False)
 
 
 class EOBNRHigherOrderModeTemplate(IMRPrecessingSpinTemplate,
