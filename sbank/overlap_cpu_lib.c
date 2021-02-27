@@ -38,13 +38,13 @@ WS *SBankCreateWorkspaceCache(void);
 
 void SBankDestroyWorkspaceCache(WS *workspace_cache);
 
-double _SBankComputeMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
+double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
 
-double _SBankComputeRealMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
+double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
 
-double _SBankComputeMatchMaxSkyLoc(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
+double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const REAL8 hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
-double _SBankComputeMatchMaxSkyLocNoPhase(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
+double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const REAL8 hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
 #define MAX_NUM_WS 32  /* maximum number of workspaces */
 #define CHECK_OOM(ptr, msg) if (!(ptr)) { XLALPrintError((msg)); XLAL_ERROR_NULL(XLAL_ENOMEM); }
@@ -135,7 +135,7 @@ static double vector_peak_interp(const double ym1, const double y, const double 
  * Returns the match for two whitened, normalized, positive-frequency
  * COMPLEX8FrequencySeries inputs.
  */
-double _SBankComputeMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
+double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -182,7 +182,7 @@ double _SBankComputeMatch(double complex *inj, double complex *tmplt, size_t min
   normalized signal proposal maximizing over the template h's overall
   amplitude. This is the most basic match function one can compute.
 */
-double _SBankComputeRealMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
+double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -220,7 +220,7 @@ double _SBankComputeRealMatch(double complex *inj, double complex *tmplt, size_t
   cross polarization hp and hc are both normalized to unity and that
   hphccorr is the correlation between these normalized components.
  */
-double _SBankComputeMatchMaxSkyLoc(double complex *hp, double complex *hc, const double hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
+double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -293,7 +293,7 @@ double _SBankComputeMatchMaxSkyLoc(double complex *hp, double complex *hc, const
     return 4. * delta_f * sqrt(max);
 }
 
-double _SBankComputeMatchMaxSkyLocNoPhase(double complex *hp, double complex *hc, const double hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
+double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
