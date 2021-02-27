@@ -7,7 +7,7 @@
 import re
 from pathlib import Path
 
-from setuptools import setup
+from setuptools import setup, Extension
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
@@ -26,9 +26,21 @@ def find_version(path, varname="__version__"):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+exts = []
+cython_compile_args = ['-O3', '-w', '-ffast-math',
+                       '-ffinite-math-only']
+
+ext = Extension("sbank.overlap",
+                ["sbank/overlap.pyx"],
+                language='c',
+                extra_compile_args=cython_compile_args,
+                extra_link_args=[],
+                compiler_directives={'embedsignature': True})
+exts.append(ext)
 
 # this function only manually specifies things that aren't
 # supported by setup.cfg (as of setuptools-30.3.0)
 setup(
     version=find_version(Path('sbank') / "__init__.py"),
+    ext_modules=exts,
 )
