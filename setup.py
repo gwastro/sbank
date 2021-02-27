@@ -30,8 +30,8 @@ exts = []
 cython_compile_args = ['-O3', '-w', '-ffast-math',
                        '-ffinite-math-only']
 
-ext = Extension("sbank.overlap",
-                ["sbank/overlap.pyx"],
+ext = Extension("sbank.overlap_cpu",
+                ["sbank/overlap_cpu.pyx"],
                 language='c',
                 extra_compile_args=cython_compile_args,
                 extra_link_args=[],
