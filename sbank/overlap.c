@@ -116,8 +116,7 @@ static double vector_peak_interp(const double ym1, const double y, const double 
  * Returns the match for two whitened, normalized, positive-frequency
  * COMPLEX8FrequencySeries inputs.
  */
-REAL8 XLALInspiralSBankComputeMatch(const COMPLEX8FrequencySeries *inj, const COMPLEX8FrequencySeries *tmplt, WS *workspace_cache) {
-    size_t min_len = (inj->data->length <= tmplt->data->length) ? inj->data->length : tmplt->data->length;
+double XLALInspiralSBankComputeMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -130,7 +129,7 @@ REAL8 XLALInspiralSBankComputeMatch(const COMPLEX8FrequencySeries *inj, const CO
     /* compute complex SNR time-series in freq-domain, then time-domain */
     /* Note that findchirp paper eq 4.2 defines a positive-frequency integral,
        so we should only fill the positive frequencies (first half of zf). */
-    multiply_conjugate(ws->zf->data, inj->data->data, tmplt->data->data, min_len);
+    multiply_conjugate(ws->zf->data, inj, tmplt, min_len);
     XLALCOMPLEX8VectorFFT(ws->zt, ws->zf, ws->plan); /* plan is reverse */
 
     /* maximize over |z(t)|^2 */
@@ -155,8 +154,7 @@ REAL8 XLALInspiralSBankComputeMatch(const COMPLEX8FrequencySeries *inj, const CO
         result = vector_peak_interp(abs2(zdata[argmax - 1]), abs2(zdata[argmax]), abs2(zdata[argmax + 1]));
 
     /* compute match */
-    /* return 4. * inj->deltaF * sqrt(result) / n; */  /* inverse FFT = reverse / n */
-    return 4. * inj->deltaF * sqrt(result);  /* Ajith, 2012-11-09: The division by n is inconsistent with the revised convention of the normalization in compute_sigmasq in SBank. I check this by computing the match of a normalized, whitened template with itself */
+    return 4. * delta_f * sqrt(result); 
 }
 
 
@@ -165,8 +163,7 @@ REAL8 XLALInspiralSBankComputeMatch(const COMPLEX8FrequencySeries *inj, const CO
   normalized signal proposal maximizing over the template h's overall
   amplitude. This is the most basic match function one can compute.
 */
-REAL8 XLALInspiralSBankComputeRealMatch(const COMPLEX8FrequencySeries *inj, const COMPLEX8FrequencySeries *tmplt, WS *workspace_cache) {
-    size_t min_len = (inj->data->length <= tmplt->data->length) ? inj->data->length : tmplt->data->length;
+double XLALInspiralSBankComputeRealMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -179,7 +176,7 @@ REAL8 XLALInspiralSBankComputeRealMatch(const COMPLEX8FrequencySeries *inj, cons
     /* compute complex SNR time-series in freq-domain, then time-domain */
     /* Note that findchirp paper eq 4.2 defines a positive-frequency integral,
        so we should only fill the positive frequencies (first half of zf). */
-    multiply_conjugate(ws->zf->data, inj->data->data, tmplt->data->data, min_len);
+    multiply_conjugate(ws->zf->data, inj, tmplt, min_len);
     XLALCOMPLEX8VectorFFT(ws->zt, ws->zf, ws->plan); /* plan is reverse */
 
     /* maximize over |Re z(t)| */
@@ -192,7 +189,7 @@ REAL8 XLALInspiralSBankComputeRealMatch(const COMPLEX8FrequencySeries *inj, cons
 	    max = temp;
 	}
     }
-    return 4. * inj->deltaF * max;
+    return 4. * delta_f * max;
 }
 
 
@@ -204,11 +201,7 @@ REAL8 XLALInspiralSBankComputeRealMatch(const COMPLEX8FrequencySeries *inj, cons
   cross polarization hp and hc are both normalized to unity and that
   hphccorr is the correlation between these normalized components.
  */
-REAL8 XLALInspiralSBankComputeMatchMaxSkyLoc(const COMPLEX8FrequencySeries *hp, const COMPLEX8FrequencySeries *hc, const REAL8 hphccorr, const COMPLEX8FrequencySeries *proposal, WS *workspace_cache1, WS *workspace_cache2) {
-
-    /* FIXME: Add sanity checking for consistency of lengths in input */
-    /* What does this do? */
-    size_t min_len = (hp->data->length <= proposal->data->length) ? hp->data->length : proposal->data->length;
+double XLALInspiralSBankComputeMatchMaxSkyLoc(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -227,9 +220,9 @@ REAL8 XLALInspiralSBankComputeMatchMaxSkyLoc(const COMPLEX8FrequencySeries *hp, 
     /* compute complex SNR time-series in freq-domain, then time-domain */
     /* Note that findchirp paper eq 4.2 defines a positive-frequency integral,
        so we should only fill the positive frequencies (first half of zf). */
-    multiply_conjugate(ws1->zf->data, hp->data->data, proposal->data->data, min_len);
+    multiply_conjugate(ws1->zf->data, hp, proposal, min_len);
     XLALCOMPLEX8VectorFFT(ws1->zt, ws1->zf, ws1->plan); /* plan is reverse */
-    multiply_conjugate(ws2->zf->data, hc->data->data, proposal->data->data, min_len);
+    multiply_conjugate(ws2->zf->data, hc, proposal, min_len);
     XLALCOMPLEX8VectorFFT(ws2->zt, ws2->zf, ws2->plan);
 
 
@@ -278,14 +271,10 @@ REAL8 XLALInspiralSBankComputeMatchMaxSkyLoc(const COMPLEX8FrequencySeries *hp, 
         result = vector_peak_interp(abs2(zdata[argmax - 1]), abs2(zdata[argmax]), abs2(zdata[argmax + 1])); */
 
     /* Return match */
-    return 4. * proposal->deltaF * sqrt(max);
+    return 4. * delta_f * sqrt(max);
 }
 
-REAL8 XLALInspiralSBankComputeMatchMaxSkyLocNoPhase(const COMPLEX8FrequencySeries *hp, const COMPLEX8FrequencySeries *hc, const REAL8 hphccorr, const COMPLEX8FrequencySeries *proposal, WS *workspace_cache1, WS *workspace_cache2) {
-    /* FIXME: Add sanity checking for consistency of lengths in input */
-
-    /* What does this do? */
-    size_t min_len = (hp->data->length <= proposal->data->length) ? hp->data->length : proposal->data->length;
+double XLALInspiralSBankComputeMatchMaxSkyLocNoPhase(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2) {
 
     /* get workspace for + and - frequencies */
     size_t n = 2 * (min_len - 1);   /* no need to integrate implicit zeros */
@@ -304,9 +293,9 @@ REAL8 XLALInspiralSBankComputeMatchMaxSkyLocNoPhase(const COMPLEX8FrequencySerie
     /* compute complex SNR time-series in freq-domain, then time-domain */
     /* Note that findchirp paper eq 4.2 defines a positive-frequency integral,
        so we should only fill the positive frequencies (first half of zf). */
-    multiply_conjugate(ws1->zf->data, hp->data->data, proposal->data->data, min_len);
+    multiply_conjugate(ws1->zf->data, hp, proposal, min_len);
     XLALCOMPLEX8VectorFFT(ws1->zt, ws1->zf, ws1->plan); /* plan is reverse */
-    multiply_conjugate(ws2->zf->data, hc->data->data, proposal->data->data, min_len);
+    multiply_conjugate(ws2->zf->data, hc, proposal, min_len);
     XLALCOMPLEX8VectorFFT(ws2->zt, ws2->zf, ws2->plan);
 
 
@@ -351,5 +340,5 @@ REAL8 XLALInspiralSBankComputeMatchMaxSkyLocNoPhase(const COMPLEX8FrequencySerie
 , abs2(zdata[argmax + 1])); */
 
     /* Return match */
-    return 4. * proposal->deltaF * sqrt(max);
+    return 4. * delta_f * sqrt(max);
 }
