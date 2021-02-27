@@ -2,7 +2,7 @@
 
 import cython
 
-cdef extern from "overlap_lib.c":
+cdef extern from "overlap_cpu_lib.c":
     ctypedef struct WS
     WS *SBankCreateWorkspaceCache()
     void SBankDestroyWorkspaceCache(WS *workspace_cache)

@@ -1,3 +1,5 @@
+# Copyright (C) 2021 Ian Harry
+
 # There is an overlap_cuda.py module, but that's never been hooked up
 # So we just hook up the CPU module in all cases. We could add switches here
 # to use the GPU if needed (although it will likely be more complicated than
