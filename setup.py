@@ -33,6 +33,7 @@ cython_compile_args = ['-O3', '-w', '-ffast-math',
 ext = Extension("sbank.overlap_cpu",
                 ["sbank/overlap_cpu.pyx"],
                 language='c',
+                libraries=['lal'],
                 extra_compile_args=cython_compile_args,
                 extra_link_args=[],
                 compiler_directives={'embedsignature': True})
