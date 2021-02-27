@@ -5,6 +5,7 @@
 """
 
 import re
+import numpy
 from pathlib import Path
 
 from setuptools import setup, Extension
@@ -32,6 +33,7 @@ cython_compile_args = ['-O3', '-w', '-ffast-math',
 
 ext = Extension("sbank.overlap_cpu",
                 ["sbank/overlap_cpu.pyx"],
+                include_dirs=[numpy.get_include()],
                 language='c',
                 libraries=['lal'],
                 extra_compile_args=cython_compile_args,
