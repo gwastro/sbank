@@ -14,12 +14,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import logging
 from numpy import float32, complex64
-import pycuda.autoinit  # noqa: F401, initializes upon import
-import pycuda.driver as cuda
-from pycuda.reduction import ReductionKernel
-from pycuda.elementwise import ElementwiseKernel
-
+try:
+    import pycuda.autoinit  # noqa: F401, initializes upon import
+    import pycuda.driver as cuda
+    from pycuda.reduction import ReductionKernel
+    from pycuda.elementwise import ElementwiseKernel
+except ImportError:
+    logging.warn("PyCUDA must be installed to use the GPU library.")
 
 class create_workspace_cache(dict):
     def __init__(self, *args, **kwargs):
