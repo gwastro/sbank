@@ -21,11 +21,11 @@ cdef class SbankWorkspaceCache:
         
     def __dealloc__(self):
         if self.workspace != NULL:
-            XLALDestroySBankWorkspaceCache(self.workspace)
+            SBankDestroyWorkspaceCache(self.workspace)
 
     cdef WS* __create(self):
         cdef WS *temp
-        temp = XLALCreateSBankWorkspaceCache()
+        temp = SBankCreateWorkspaceCache()
         return temp
 
     cdef WS* get_workspace(self):
