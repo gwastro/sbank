@@ -20,12 +20,31 @@
 #include <string.h>
 #include <math.h>
 #include <complex.h>
+#include <sys/types.h>
 #include <lal/AVFactories.h>
 #include <lal/ComplexFFT.h>
 #include <lal/XLALError.h>
 #include <lal/FrequencySeries.h>
-#include <lal/LALInspiralSBankOverlap.h>
-#include <sys/types.h>
+#include <lal/LALAtomicDatatypes.h>
+
+typedef struct tagWS {
+    size_t n;
+    COMPLEX8FFTPlan *plan;
+    COMPLEX8Vector *zf;
+    COMPLEX8Vector *zt;
+} WS;
+
+WS *XLALCreateSBankWorkspaceCache(void);
+
+void XLALDestroySBankWorkspaceCache(WS *workspace_cache);
+
+double XLALInspiralSBankComputeMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
+
+double XLALInspiralSBankComputeRealMatch(double complex *inj, double complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
+
+double XLALInspiralSBankComputeMatchMaxSkyLoc(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
+
+double XLALInspiralSBankComputeMatchMaxSkyLocNoPhase(double complex *hp, double complex *hc, const REAL8 hphccorr, double complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
 #define MAX_NUM_WS 32  /* maximum number of workspaces */
 #define CHECK_OOM(ptr, msg) if (!(ptr)) { XLALPrintError((msg)); XLAL_ERROR_NULL(XLAL_ENOMEM); }
