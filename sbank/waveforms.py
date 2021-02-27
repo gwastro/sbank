@@ -939,8 +939,8 @@ class EOBNRHigherOrderModeAmpMaxTemplate(IMRPrecessingSpinTemplate):
         proposal = other.get_whitened_normalized(df, **kwargs)
 
         # maximize over amplitude of template only
-        return InspiralSBankComputeRealMatch(tmplt, proposal,
-                                             workspace_cache[0])
+        return SBankComputeMatch(tmplt, proposal,
+                                 workspace_cache[0], phase_maximized=False)
 
 
 class EOBNRHigherOrderModePhaseMaxTemplate(IMRPrecessingSpinTemplate):

@@ -25,7 +25,7 @@ from six.moves import range
 import numpy as np
 
 from lal.iterutils import inorder, uniq
-from lalinspiral import CreateSBankWorkspaceCache
+from .overlap import SbankWorkspaceCache
 from .psds import get_neighborhood_ASD, get_PSD, get_neighborhood_df_fmax
 from . import waveforms
 
@@ -74,7 +74,8 @@ class Bank(object):
             self.compute_match = self._metric_match
         else:
             # The max over skyloc stuff needs a second cache
-            self._workspace_cache = [CreateSBankWorkspaceCache(), CreateSBankWorkspaceCache()]
+            self._workspace_cache = [SbankWorkspaceCache(),
+                                     SBankWorkspaceCache()]
             self.compute_match = self._brute_match
 
     def __len__(self):
@@ -266,7 +267,15 @@ class Bank(object):
 
     def clear(self):
         if hasattr(self, "_workspace_cache"):
-            self._workspace_cache = CreateSBankWorkspaceCache()
+            # As this is defined at the cython level, I'm not sure I'm going to
+            # trust automatic garbage collection. So do this manually.
+            # ..... I hope this actually works!!
+            old_wsc = self._workspace_cache[0]
+            del old_wsc
+            old_wsc = self._workspace_cache[1]
+            del old_wsc
+            self._workspace_cache[0] = SBankWorkspaceCache()
+            self._workspace_cache[1] = SBankWorkspaceCache()
 
         for tmplt in self._templates:
             tmplt.clear()
