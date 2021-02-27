@@ -5,9 +5,7 @@
 # to use the GPU if needed (although it will likely be more complicated than
 # that if the waveforms were not generated on the GPU)
 
-from .overlap_cpu import _SBankComputeMatch, _SBankComputeRealMatch
-from .overlap_cpu import _SBankComputeMatchMaxSkyLoc
-from .overlap_cpu import _SBankComputeMatchMaxSkyLocNoPhase
+from .overlap_cpu import SBankCythonComputeMatch,
 from .overlap_cpu import SbankWorkspaceCache as CPUWorkspaceCache
 
 # If considering enabling the GPU code, need to switch this as well.
@@ -26,8 +24,8 @@ def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
     assert(inj.delta_f == tmplt.delta_f)
     delta_f = inj.delta_f
     if phase_maximized:
-        return _SBankComputeMatch(inj.data.data, tmplt.data.data, min_len,
-                                  delta_f, workspace_cache.get_workspace())
+        return SBankCythonComputeMatch(inj.data.data, tmplt.data.data, min_len,
+                                       delta_f, workspace_cache.get_workspace())
     else:
         return _SBankComputeRealMatch(inj.data.data, tmplt.data.data, min_len,
                                       delta_f, workspace_cache.get_workspace())

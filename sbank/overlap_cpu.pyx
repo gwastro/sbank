@@ -31,3 +31,18 @@ cdef class SbankWorkspaceCache:
     cdef WS* get_workspace(self):
         return self.workspace
 
+# As a reference for sending numpy arrays onto C++
+# https://github.com/cython/cython/wiki/tutorials-NumpyPointerToC
+# http://docs.cython.org/en/latest/src/userguide/wrapping_CPlusPlus.html
+# https://cython.readthedocs.io/en/latest/src/tutorial/numpy.html
+# https://stackoverflow.com/questions/21242160/how-to-build-a-cython-wrapper-for-c-function-with-stl-list-parameter
+
+def SbankCythonComputeMatch(
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] inj not None,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] tmplt not None,
+    int min_len,
+    double delta_f,
+    WS workspace_cache
+)
+    return _SBankComputeMatch(&inj[0], &tmplt[0], min_len, delta_f,
+                              workspace_cache)
