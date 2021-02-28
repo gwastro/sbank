@@ -62,3 +62,51 @@ def SBankCythonComputeMatch(
     _workspace = SBankWorkspaceCache.get_workspace(workspace_cache)
     return _SBankComputeMatch(&inj[0], &tmplt[0], min_len, delta_f,
                               _workspace)
+
+def SBankCythonComputeRealMatch(
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] inj,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] tmplt,
+    int min_len,
+    double delta_f,
+    workspace_cache
+):
+    cdef WS* _workspace
+    _workspace = SBankWorkspaceCache.get_workspace(workspace_cache)
+    return _SBankComputeRealMatch(&inj[0], &tmplt[0], min_len, delta_f,
+                                  _workspace)
+
+def SBankCythonComputeMatchMaxSkyLoc(
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] hp,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] hc,
+    double hphccorr,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] proposal,
+    int min_len,
+    double delta_f,
+    workspace_cache1,
+    workspace_cache2
+):
+    cdef WS* _workspace1
+    cdef WS* _workspace2
+    _workspace1 = SBankWorkspaceCache.get_workspace(workspace_cache1)
+    _workspace2 = SBankWorkspaceCache.get_workspace(workspace_cache2)
+    return _SBankComputeMatchMaxSkyLoc(&hp[0], &hc[0], hphccorr, &proposal[0],
+                                       min_len, delta_f, _workspace1,
+                                       _workspace2)
+
+def SBankCythonComputeMatchMaxSkyLocNoPhase(
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] hp,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] hc,
+    double hphccorr,
+    numpy.ndarray[numpy.complex64_t, ndim=1, mode="c"] proposal,
+    int min_len,
+    double delta_f,
+    workspace_cache1,
+    workspace_cache2
+):
+    cdef WS* _workspace1
+    cdef WS* _workspace2
+    _workspace1 = SBankWorkspaceCache.get_workspace(workspace_cache1)
+    _workspace2 = SBankWorkspaceCache.get_workspace(workspace_cache2)
+    return _SBankComputeMatchMaxSkyLocNoPhase(&hp[0], &hc[0], hphccorr,
+                                              &proposal[0], min_len, delta_f,
+                                              _workspace1, _workspace2)
