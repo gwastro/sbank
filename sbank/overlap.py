@@ -15,6 +15,7 @@ from .overlap_cpu import SBankWorkspaceCache as CPUWorkspaceCache
 # Currently the GPU WorkspaceCache will not work and would need some fixing.
 SBankWorkspaceCache = CPUWorkspaceCache
 
+
 def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
     """
     ADD ME
@@ -32,6 +33,7 @@ def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
     else:
         return SBankCythonComputeRealMatch(inj.data.data, tmplt.data.data,
                                            min_len, delta_f, workspace_cache)
+
 
 def SbankComputeMatchSkyLoc(hp, hc, hphccorr, proposal, workspace_cache1,
                             workspace_cache2, phase_maximized=False):
@@ -62,4 +64,3 @@ def SbankComputeMatchSkyLoc(hp, hc, hphccorr, proposal, workspace_cache1,
             workspace_cache1,
             workspace_cache2
         )
-

@@ -27,6 +27,7 @@ def find_version(path, varname="__version__"):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+
 exts = []
 cython_compile_args = ['-O3', '-w', '-ffast-math',
                        '-ffinite-math-only']

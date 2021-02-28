@@ -114,7 +114,7 @@ class Bank(object):
 
     def add_from_hdf(self, hdf_fp):
         num_points = len(hdf_fp['mass1'])
-        newtmplts=[]
+        newtmplts = []
         for idx in range(num_points):
             if not idx % 100000:
                 tmp = {}
@@ -125,14 +125,15 @@ class Bank(object):
             approx = tmp['approximant'][c_idx]
             tmplt_class = waveforms.waveforms[approx]
             newtmplts.append(tmplt_class.from_dict(tmp, c_idx, self))
-            newtmplts[-1].is_seed_point=True
+            newtmplts[-1].is_seed_point = True
         self._templates.extend(newtmplts)
         self._templates.sort(key=attrgetter(self.nhood_param))
 
     @classmethod
     def from_sngls(cls, sngls, tmplt_class, *args, **kwargs):
         bank = cls(*args, **kwargs)
-        bank._templates.extend([tmplt_class.from_sngl(s, bank=bank) for s in sngls])
+        new_tmplts = [tmplt_class.from_sngl(s, bank=bank) for s in sngls]
+        bank._templates.extend(new_tmplts)
         bank._templates.sort(key=attrgetter(bank.nhood_param))
         # Mark all templates as seed points
         for template in bank._templates:
@@ -142,14 +143,15 @@ class Bank(object):
     @classmethod
     def from_sims(cls, sims, tmplt_class, *args):
         bank = cls(*args)
-        bank._templates.extend([tmplt_class.from_sim(s, bank=bank) for s in sims])
+        new_sims = [tmplt_class.from_sim(s, bank=bank) for s in sims]
+        bank._templates.extend(new_sims)
         return bank
 
     def _metric_match(self, tmplt, proposal, f, **kwargs):
         return tmplt.metric_match(proposal, f, **kwargs)
 
     def _brute_match(self, tmplt, proposal, f, **kwargs):
-        match = tmplt.brute_match(proposal, f,self._workspace_cache, **kwargs)
+        match = tmplt.brute_match(proposal, f, self._workspace_cache, **kwargs)
         if not self.cache_waveforms:
             tmplt.clear()
         return match
@@ -167,20 +169,24 @@ class Bank(object):
         # find templates in the bank "near" this tmplt
         prop_nhd = getattr(proposal, self.nhood_param)
         if not nhood:
-            low, high = _find_neighborhood(self._nhoods, prop_nhd, self.nhood_size)
+            low, high = _find_neighborhood(self._nhoods, prop_nhd,
+                                           self.nhood_size)
             tmpbank = self._templates[low:high]
         else:
             tmpbank = nhood
-        if not tmpbank: return (max_match, template)
+        if not tmpbank:
+            return (max_match, template)
 
         # sort the bank by its nearness to tmplt in mchirp
         # NB: This sort comes up as a dominating cost if you profile,
         # but it cuts the number of match evaluations by 80%, so turns out
         # to be worth it even for metric match, where matches are cheap.
-        tmpbank.sort(key=lambda b: abs( getattr(b, self.nhood_param) - prop_nhd))
+        sort_func = lambda b: abs(getattr(b, self.nhood_param) - prop_nhd)
+        tmpbank.sort(key=sort_func)
 
         # set parameters of match calculation that are optimized for this block
-        df_end, f_max = get_neighborhood_df_fmax(tmpbank + [proposal], self.flow)
+        df_end, f_max = get_neighborhood_df_fmax(tmpbank + [proposal],
+                                                 self.flow)
         if self.fhigh_max:
             f_max = min(f_max, self.fhigh_max)
         if self.iterative_match_df_max is not None:
@@ -198,9 +204,10 @@ class Bank(object):
             if self.coarse_match_df:
                 # Perform a match at high df to see if point can be quickly
                 # ruled out as already covering the proposal
-                PSD = get_PSD(self.coarse_match_df, self.flow, f_max, self.noise_model)
-                match = self.compute_match(tmplt, proposal, self.coarse_match_df,
-                                           PSD=PSD)
+                PSD = get_PSD(self.coarse_match_df, self.flow, f_max,
+                              self.noise_model)
+                match = self.compute_match(tmplt, proposal,
+                                           self.coarse_match_df, PSD=PSD)
                 if match == 0:
                     err_msg = "Match is 0. This might indicate that you have "
                     err_msg += "the df value too high. Please try setting the "
@@ -247,7 +254,8 @@ class Bank(object):
 
     def max_match(self, proposal):
         match, best_tmplt_ind = self.argmax_match(proposal)
-        if not match: return (0., 0)
+        if not match:
+            return (0., 0)
         return match, self._templates[best_tmplt_ind]
 
     def argmax_match(self, proposal):
@@ -255,13 +263,16 @@ class Bank(object):
         prop_nhd = getattr(proposal, self.nhood_param)
         low, high = _find_neighborhood(self._nhoods, prop_nhd, self.nhood_size)
         tmpbank = self._templates[low:high]
-        if not tmpbank: return (0., 0)
+        if not tmpbank:
+            return (0., 0)
 
         # set parameters of match calculation that are optimized for this block
-        df, ASD = get_neighborhood_ASD(tmpbank + [proposal], self.flow, self.noise_model)
+        df, ASD = get_neighborhood_ASD(tmpbank + [proposal], self.flow,
+                                       self.noise_model)
 
         # compute matches
-        matches = [self.compute_match(tmplt, proposal, df, ASD=ASD) for tmplt in tmpbank]
+        matches = [self.compute_match(tmplt, proposal, df, ASD=ASD)
+                   for tmplt in tmpbank]
         best_tmplt_ind = np.argmax(matches)
         self._nmatch += len(tmpbank)
 
@@ -270,13 +281,6 @@ class Bank(object):
 
     def clear(self):
         if hasattr(self, "_workspace_cache"):
-            # As this is defined at the cython level, I'm not sure I'm going to
-            # trust automatic garbage collection. So do this manually.
-            # ..... I hope this actually works!!
-            old_wsc = self._workspace_cache[0]
-            del old_wsc
-            old_wsc = self._workspace_cache[1]
-            del old_wsc
             self._workspace_cache[0] = SBankWorkspaceCache()
             self._workspace_cache[1] = SBankWorkspaceCache()
 
