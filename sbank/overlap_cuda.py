@@ -56,12 +56,10 @@ class create_workspace_cache(dict):
         ws = self.get(n)
         if ws:
             return ws
-        return self.setdefault(
-            n,
-            (pycufftplan(int(n), stream=self.stream, normalize=False),
-            gpuarray.empty(n, dtype=complex64(0.).dtype),
-            gpuarray.empty(n, dtype=complex64(0.).dtype))
-        )
+        def_tuple = (pycufftplan(int(n), stream=self.stream, normalize=False),
+                     gpuarray.empty(n, dtype=complex64(0.).dtype),
+                     gpuarray.empty(n, dtype=complex64(0.).dtype))
+        return self.setdefault(n, def_tuple)
 
 
 def destroy_workspace_cache(ws):
@@ -96,5 +94,5 @@ def compute_match(tmplt, inj, workspace):
 
     plan.execute(a_gpu, data_out=b_gpu, inverse=True)
 
-    ret_val = workspace.max_abs_knl(b_gpu).get() * (min_len - 1.) 
+    ret_val = workspace.max_abs_knl(b_gpu).get() * (min_len - 1.)
     return 4. * inj.deltaF * (ret_val / (max_len - 1.))**0.5 / n

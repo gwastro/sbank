@@ -22,57 +22,55 @@ import sys
 from math import isnan
 import numpy as np
 from numpy import float32
-np.seterr(all="ignore")
-
 import lal
 import lalsimulation as lalsim
-from lal import MSUN_SI, MTSUN_SI, PC_SI, PI, CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
+from lal import MSUN_SI, MTSUN_SI, PC_SI, PI
+from lal import CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
+from glue.ligolw.lsctables import SnglInspiralTable as gluesit
+
 from .overlap import SbankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD
 from .tau0tau3 import m1m2_to_tau0tau3
 
-# I wanted to use lalmetaio here, but the class has issues with python as the
-# LALGPSTime class is different (ie. no end_time_ns but
-# end_time.gpsNanoSeconds) and the Gamma values are stored as an array.
-# Also not convinced it can use the *python* XML reading routines
-# So for now we use lsctables.SnglInspiralTable
-
-# from lalmetaio import SnglInspiralTable
-from glue.ligolw.lsctables import SnglInspiralTable as gluesit
-
-# Add some small code to initialize columns to 0 or ''
+np.seterr(all="ignore")
 _sit_cols = gluesit.validcolumns
+
+
 class SnglInspiralTable(gluesit):
     def __init__(self, *args, **kwargs):
         gluesit.__init__(self, *args, **kwargs)
         for entry in _sit_cols.keys():
-            if not(hasattr(self,entry)):
+            if not(hasattr(self, entry)):
                 if _sit_cols[entry] in ['real_4','real_8']:
-                    setattr(self,entry,0.)
+                    setattr(self, entry, 0.)
                 elif _sit_cols[entry] == 'int_4s':
-                    setattr(self,entry,0)
+                    setattr(self, entry, 0)
                 elif _sit_cols[entry] == 'lstring':
-                    setattr(self,entry,'')
+                    setattr(self, entry, '')
                 elif _sit_cols[entry] == 'ilwd:char':
-                    setattr(self,entry,'')
+                    setattr(self, entry, '')
             else:
-                print("Column %s not recognized" %(entry), file=sys.stderr)
+                print("Column %s not recognized" % entry, file=sys.stderr)
                 raise ValueError
+
 
 def compute_mchirp(m1, m2):
     return (m1 * m1 * m1 * m2 * m2 * m2 / (m1 + m2))**0.2
 
-def ceil_pow_2( number ):
-    return int(2**(np.ceil(np.log2( number ))))
+
+def ceil_pow_2(number):
+    return int(2**(np.ceil(np.log2(number))))
+
 
 #
 # Represent template waveforms
 #
-
 def project_hplus_hcross(hplus, hcross, theta, phi, psi):
     # compute antenna factors Fplus and Fcross
-    Fp = 0.5*(1 + np.cos(theta)**2)*np.cos(2*phi)*np.cos(2*psi) - np.cos(theta)*np.sin(2*phi)*np.sin(2*psi)
-    Fc = 0.5*(1 + np.cos(theta)**2)*np.cos(2*phi)*np.sin(2*psi) + np.cos(theta)*np.sin(2*phi)*np.cos(2*psi)
+    Fp = 0.5*(1 + np.cos(theta)**2)*np.cos(2*phi)*np.cos(2*psi)
+    Fp -= np.cos(theta)*np.sin(2*phi)*np.sin(2*psi)
+    Fc = 0.5*(1 + np.cos(theta)**2)*np.cos(2*phi)*np.sin(2*psi)
+    Fc += np.cos(theta)*np.sin(2*phi)*np.cos(2*psi)
 
     # form strain signal in detector
     # hoft = lal.CreateCOMPLEX16FrequncySeries("h(t)", hplus.epoch, hplus.f0, hplus.deltaF, lal.lalSecondUnit, hplus.data.length)
@@ -92,15 +90,19 @@ def compute_correlation(htilde1, htilde2, deltaF):
     Find the real component of correlation between htilde1 and htilde2.
     """
     # vdot is dot with complex conjugation
-    return float(np.vdot(htilde1,htilde2).real * 4 * deltaF)
+    return float(np.vdot(htilde1, htilde2).real * 4 * deltaF)
+
 
 def FrequencySeries_to_COMPLEX8FrequencySeries(fs):
     """
-    Create a new COMPLEX8FrequencySeries and copy the results of the input FrequencySeries to it.
+    Create a new COMPLEX8FrequencySeries and copy the results of the input
+    FrequencySeries to it.
     """
-    new = CreateCOMPLEX8FrequencySeries(fs.name, fs.epoch, fs.f0, fs.deltaF, fs.sampleUnits, fs.data.length)
+    new = CreateCOMPLEX8FrequencySeries(fs.name, fs.epoch, fs.f0, fs.deltaF,
+                                        fs.sampleUnits, fs.data.length)
     new.data.data[:] = fs.data.data[:]  # numpy automagic conversion
     return new
+
 
 def create_moments(df, flow, len_PSD):
     # moments go from flow to fmax unlike the PSD, which starts at 0
@@ -134,17 +136,25 @@ def create_moments(df, flow, len_PSD):
     momK_10 = lal.CreateREAL8Vector(n)
     momK_11 = lal.CreateREAL8Vector(n)
     momK_12 = lal.CreateREAL8Vector(n)
-    return (momI_0, momI_2, momI_3, momI_4, momI_5, momI_6, momI_7, momI_8, momI_9, momI_10, momI_11, momI_12, momI_13, momI_14, momI_15, momI_16, momJ_5, momJ_6, momJ_7, momJ_8, momJ_9, momJ_10, momJ_11, momJ_12, momJ_13, momJ_14, momK_10, momK_11, momK_12)
+    return (momI_0, momI_2, momI_3, momI_4, momI_5, momI_6, momI_7, momI_8,
+            momI_9, momI_10, momI_11, momI_12, momI_13, momI_14, momI_15,
+            momI_16, momJ_5, momJ_6, momJ_7, momJ_8, momJ_9, momJ_10, momJ_11,
+            momJ_12, momJ_13, momJ_14, momK_10, momK_11, momK_12)
+
 
 PI_p5 = PI**5
+
+
 def compute_chirptimes(mchirp, eta, chi, flow):
     theta0 = (125. / 2. / (16. * PI * flow * mchirp * MTSUN_SI)**5)**(1./3)
     theta3 = (16. * PI_p5 / 25. * theta0 * theta0 / (eta * eta * eta))**0.2
     theta3s = 113. / (48 * PI) * chi * theta3
     return theta0, theta3, theta3s
 
+
 def compute_tau0(mc, flow):
     return 5. * mc * MTSUN_SI / (256 * (PI * flow * mc * MTSUN_SI)**(8./3))
+
 
 def compute_tau0_40(mc):
     return compute_tau0(mc, 40.)
@@ -170,13 +180,15 @@ class AlignedSpinTemplate(object):
       a sim_inspiral object.
     """
     approximant = None
-    __slots__ = ("m1", "m2", "spin1z", "spin2z", "chieff", "bank", "tau0", "_dur", "_mchirp", "_wf", "_metric", "sigmasq", "is_seed_point", "_f_final", "_fhigh_max")
+    __slots__ = ("m1", "m2", "spin1z", "spin2z", "chieff", "bank", "tau0",
+                 "_dur", "_mchirp", "_wf", "_metric", "sigmasq",
+                 "is_seed_point", "_f_final", "_fhigh_max")
     param_names = ("m1", "m2", "spin1z", "spin2z")
     param_formats = ("%.2f", "%.2f", "%.2f", "%.2f")
-    hdf_dtype=[('mass1', float32), ('mass2', float32),
-               ('spin1z', float32), ('spin2z', float32),
-               ('template_duration', float32), ('f_lower', float32),
-               ('approximant', 'S32')]
+    hdf_dtype = [('mass1', float32), ('mass2', float32),
+                 ('spin1z', float32), ('spin2z', float32),
+                 ('template_duration', float32), ('f_lower', float32),
+                 ('approximant', 'S32')]
 
     def __init__(self, m1, m2, spin1z, spin2z, bank, flow=None, duration=None):
 
@@ -261,8 +273,13 @@ class AlignedSpinTemplate(object):
         return 6**-1.5 / (PI * (self.m1 + self.m2) * MTSUN_SI)  # ISCO
 
     def _get_chirp_dur(self):
-        return lalsim.SimInspiralTaylorF2ReducedSpinChirpTime(self.flow,
-            self.m1 * MSUN_SI, self.m2 * MSUN_SI, self.chieff, 7)
+        return lalsim.SimInspiralTaylorF2ReducedSpinChirpTime(
+            self.flow,
+            self.m1 * MSUN_SI,
+            self.m2 * MSUN_SI,
+            self.chieff,
+            7
+        )
 
     def _get_imr_dur(self):
         """
@@ -345,11 +362,10 @@ class AlignedSpinTemplate(object):
         """
         pass
 
-
     def _compute_waveform(self, df, f_final):
 
         phi0 = 0  # This is a reference phase, and not an intrinsic parameter
-        approx = lalsim.GetApproximantFromString( self.approximant )
+        approx = lalsim.GetApproximantFromString(self.approximant)
 
         if lalsim.SimInspiralImplementedFDApproximants(approx):
             hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
@@ -369,7 +385,6 @@ class AlignedSpinTemplate(object):
                 df, self.flow, f_final, 40.,
                 None, approx)
         return hplus_fd
-
 
     def get_whitened_normalized(self, df, ASD=None, PSD=None):
         """
@@ -391,7 +406,7 @@ class AlignedSpinTemplate(object):
             # whiten
             arr_view[:] /= ASD[:wf.data.length]
             arr_view[:int(self.flow / df)] = 0.
-            arr_view[int(self.f_final/df) : wf.data.length] = 0.
+            arr_view[int(self.f_final/df):wf.data.length] = 0.
 
             # normalize
             self.sigmasq = compute_sigmasq(arr_view, df)
@@ -533,14 +548,15 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
 
     def __init__(self, m1, m2, spin1z, spin2z, bank, flow=None, duration=None):
 
-        warn_msg = "DEPRECATION WARNING: It is not a good idea to use this "
-                   "approximant. The TaylorF2 approximant is the best thing "
-                   "to use if you are constructing a 'brute-force match' "
-                   "bank. This allows the use of both spins correctly, and "
-                   "the inclusion of all PN terms currently known. "
-                   "If using the metric, the implementation in PyCBC, which "
-                   "gets terms directly from lalsimulation, and so "
-                   "automatically stays up to date, is more accurate."
+        warn_msg = ("DEPRECATION WARNING: It is not a good idea to use this "
+                    "approximant. The TaylorF2 approximant is the best thing "
+                    "to use if you are constructing a 'brute-force match' "
+                    "bank. This allows the use of both spins correctly, and "
+                    "the inclusion of all PN terms currently known. "
+                    "If using the metric, the implementation in PyCBC, which "
+                    "gets terms directly from lalsimulation, and so "
+                    "automatically stays up to date, is more accurate."
+                   )
         logging.warn(warn_msg)
         AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
                                      flow=flow, duration=duration)
@@ -559,12 +575,13 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
         )
 
     def finalize_as_template(self):
-        if not self.bank.use_metric: return
+        if not self.bank.use_metric:
+            return
 
         df, PSD = get_neighborhood_PSD([self], self.flow,
                                        self.bank.noise_model)
 
-        curr_len = (len(PSD) - self.flow // df) 
+        curr_len = (len(PSD) - self.flow // df)
         length_check = curr_len > self.bank._moments[df][0].length
         if df not in self.bank._moments or length_check:
             real8vector_psd = CreateREAL8Vector(len(PSD))
@@ -590,14 +607,9 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
         dx0 = other._theta0 - self._theta0
         dx1 = other._theta3 - self._theta3
         dx2 = other._theta3s - self._theta3s
-        match = 1 - (
-            g00 * dx0 * dx0
-          + 2 * g01 * dx0 * dx1
-          + 2 * g02 * dx0 * dx2
-          + g11 * dx1 * dx1
-          + 2 * g12 * dx1 * dx2
-          + g22 * dx2 * dx2
-        )
+        match = 1 - (g00 * dx0 * dx0 + 2 * g01 * dx0 * dx1 +
+                     2 * g02 * dx0 * dx2 + g11 * dx1 * dx1 +
+                     2 * g12 * dx1 * dx2 + g22 * dx2 * dx2)
 
         return match
 
@@ -662,7 +674,22 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
         self.psi = float(psi)
         self.orb_phase = float(orb_phase)
 
-        self.chieff, self.chipre = lalsim.SimIMRPhenomPCalculateModelParametersFromSourceFrame(self.m1, self.m2, self.flow, self.orb_phase, self.iota, self.spin1x, self.spin1y, self.spin1z, self.spin2x, self.spin2y, self.spin2z, lalsim.IMRPhenomPv2_V)[:2]
+        outs = lalsim.SimIMRPhenomPCalculateModelParametersFromSourceFrame(
+            self.m1,
+            self.m2,
+            self.flow,
+            self.orb_phase,
+            self.iota,
+            self.spin1x,
+            self.spin1y,
+            self.spin1z,
+            self.spin2x,
+            self.spin2y,
+            self.spin2z,
+            lalsim.IMRPhenomPv2_V
+        )
+        self.chieff = outs[0]
+        self.chipre = outs[1]
 
         self._wf = {}
         self._metric = None
@@ -683,7 +710,7 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
                    sim.coa_phase, bank)
 
     def _compute_waveform_comps(self, df, f_final):
-        approx = lalsim.GetApproximantFromString( self.approximant )
+        approx = lalsim.GetApproximantFromString(self.approximant)
         if lalsim.SimInspiralImplementedFDApproximants(approx):
             hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
                 self.m1*MSUN_SI, self.m2*MSUN_SI,
@@ -719,7 +746,7 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
         match the length of the ASD, so its normalization depends on
         its own length.
         """
-        if not self._wf_hp.has_key(df):
+        if df not in self._wf_hp:
             # Clear self._wf as it won't be needed any more if calling here
             self._wf = {}
             # Generate a new wf
@@ -735,11 +762,11 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
             # Whiten
             arr_view_hp[:] /= ASD[:hp.data.length]
             arr_view_hp[:int(self.flow / df)] = 0.
-            arr_view_hp[int(self.f_final/df) : hp.data.length] = 0.
+            arr_view_hp[int(self.f_final/df):hp.data.length] = 0.
 
             arr_view_hc[:] /= ASD[:hc.data.length]
             arr_view_hc[:int(self.flow / df)] = 0.
-            arr_view_hc[int(self.f_final/df) : hc.data.length] = 0.
+            arr_view_hc[int(self.f_final/df):hc.data.length] = 0.
 
             # Get normalization factors and normalize
             self._hpsigmasq[df] = compute_sigmasq(arr_view_hp, df)
@@ -753,13 +780,12 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
             self._wf_hp[df] = FrequencySeries_to_COMPLEX8FrequencySeries(hp)
             self._wf_hc[df] = FrequencySeries_to_COMPLEX8FrequencySeries(hc)
 
-
         return self._wf_hp[df], self._wf_hc[df], self._hphccorr[df]
 
     def brute_match(self, other, df, workspace_cache, **kwargs):
 
         # Template generates hp and hc
-        hp, hc, hphccorr =  self.get_whitened_normalized_comps(df, **kwargs)
+        hp, hc, hphccorr = self.get_whitened_normalized_comps(df, **kwargs)
 
         # Proposal generates h(t), sky loc is later discarded.
         proposal = other.get_whitened_normalized(df, **kwargs)
@@ -865,17 +891,19 @@ class InspiralPrecessingSpinTemplate(PrecessingSpinTemplate):
 
 class SpinTaylorF2Template(InspiralPrecessingSpinTemplate):
     approximant = "SpinTaylorF2"
+
     def __init__(self, m1, m2, spin1x, spin1y, spin1z,
                  theta, phi, iota, psi, orb_phase, bank, flow=None,
                  duration=None):
-        super(SpinTaylorF2Template,self).__init__(m1, m2,
-                                    spin1x, spin1y, spin1z, 0, 0, 0,
-                                    theta, phi, iota, psi, orb_phase, bank,
-                                    flow=flow, duration=None)
+        super(SpinTaylorF2Template, self).__init__(m1, m2, spin1x, spin1y
+                                                   spin1z, 0, 0, 0, theta, phi,
+                                                   iota, psi, orb_phase, bank,
+                                                   flow=flow, duration=None)
 
     def _compute_waveform_comps(self, df, f_final):
         hplus_fd, hcross_fd = \
-          super(SpinTaylorF2Template,self)._compute_waveform_comps(df, f_final)
+          super(SpinTaylorF2Template, self)._compute_waveform_comps(df,
+                                                                    f_final)
         # Must set values greater than _get_f_final to 0
         act_f_max = self._get_f_final()
         f_max_idx = int(act_f_max / df + 0.999)
@@ -955,11 +983,10 @@ class HigherOrderModeTemplate(PrecessingSpinTemplate):
     def brute_match(self, other, df, workspace_cache, **kwargs):
 
         # Template generates hp and hc
-        hp, hc, hphccorr =  self.get_whitened_normalized_comps(df, **kwargs)
+        hp, hc, hphccorr = self.get_whitened_normalized_comps(df, **kwargs)
 
         # Proposal generates h(t), sky loc is later discarded.
         proposal = other.get_whitened_normalized(df, **kwargs)
-
 
         # maximize over sky position of template
         return SBankComputeMatchMaxSkyLoc(hp, hc,
@@ -978,6 +1005,7 @@ class EOBNRHigherOrderModeTemplate(IMRPrecessingSpinTemplate,
 class EOBNRHigherOrderModeAmpMaxTemplate(IMRPrecessingSpinTemplate):
     """Class for EOBNRHM templates."""
     approximant = "EOBNRv2HM_ROM"
+
     def brute_match(self, other, df, workspace_cache, **kwargs):
 
         tmplt =  self.get_whitened_normalized(df, **kwargs)
@@ -995,7 +1023,7 @@ class EOBNRHigherOrderModePhaseMaxTemplate(IMRPrecessingSpinTemplate):
 
 waveforms = {
     "TaylorF2RedSpin": TaylorF2RedSpinTemplate,
-    "TaylorF2" : TaylorF2Template,
+    "TaylorF2": TaylorF2Template,
     "IMRPhenomB": IMRPhenomBTemplate,
     "IMRPhenomC": IMRPhenomCTemplate,
     "IMRPhenomD": IMRPhenomDTemplate,
@@ -1011,8 +1039,8 @@ waveforms = {
     "SpinTaylorT5": SpinTaylorT5Template,
     "SpinTaylorF2": SpinTaylorF2Template,
     "SpinTaylorT5Fourier": SpinTaylorT5FourierTemplate,
-    "SEOBNRv3":SEOBNRv3Template,
-    "EOBNRv2HM_ROM":EOBNRHigherOrderModeTemplate,
-    "EOBNRv2HM_ROM_AmpMax":EOBNRHigherOrderModeAmpMaxTemplate,
-    "EOBNRv2HM_ROM_PhaseMax":EOBNRHigherOrderModePhaseMaxTemplate
+    "SEOBNRv3": SEOBNRv3Template,
+    "EOBNRv2HM_ROM": EOBNRHigherOrderModeTemplate,
+    "EOBNRv2HM_ROM_AmpMax": EOBNRHigherOrderModeAmpMaxTemplate,
+    "EOBNRv2HM_ROM_PhaseMax": EOBNRHigherOrderModePhaseMaxTemplate
 }

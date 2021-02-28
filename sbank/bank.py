@@ -96,7 +96,8 @@ class Bank(object):
     def merge(cls, *banks):
         if not banks:
             raise ValueError("cannot merge zero banks")
-        cls_args = list(uniq((b.tmplt_class, b.noise_model, b.flow, b.use_metric) for b in banks))
+        cls_args = list(uniq((b.tmplt_class, b.noise_model, b.flow,
+                              b.use_metric) for b in banks))
         if len(cls_args) > 1:
             return ValueError("bank parameters do not match")
         merged = cls(*cls_args)
@@ -181,8 +182,7 @@ class Bank(object):
         # NB: This sort comes up as a dominating cost if you profile,
         # but it cuts the number of match evaluations by 80%, so turns out
         # to be worth it even for metric match, where matches are cheap.
-        sort_func = lambda b: abs(getattr(b, self.nhood_param) - prop_nhd)
-        tmpbank.sort(key=sort_func)
+        tmpbank.sort(key=lambda b: abs(getattr(b, self.nhood_param) - prop_nhd))
 
         # set parameters of match calculation that are optimized for this block
         df_end, f_max = get_neighborhood_df_fmax(tmpbank + [proposal],
