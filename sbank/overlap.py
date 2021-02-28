@@ -35,7 +35,7 @@ def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
                                            min_len, delta_f, workspace_cache)
 
 
-def SbankComputeMatchSkyLoc(hp, hc, hphccorr, proposal, workspace_cache1,
+def SBankComputeMatchSkyLoc(hp, hc, hphccorr, proposal, workspace_cache1,
                             workspace_cache2, phase_maximized=False):
     """
     ADD ME

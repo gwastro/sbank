@@ -791,10 +791,10 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
         proposal = other.get_whitened_normalized(df, **kwargs)
 
         # maximize over sky position of template
-        return SBankComputeMatchMaxSkyLoc(hp, hc, hphccorr,
-                                          proposal, workspace_cache[0],
-                                          workspace_cache[1],
-                                          phase_maximized=True)
+        return SBankComputeMatchSkyLoc(hp, hc, hphccorr,
+                                       proposal, workspace_cache[0],
+                                       workspace_cache[1],
+                                       phase_maximized=True)
 
     @classmethod
     def from_sngl(cls, sngl, bank):
@@ -989,11 +989,11 @@ class HigherOrderModeTemplate(PrecessingSpinTemplate):
         proposal = other.get_whitened_normalized(df, **kwargs)
 
         # maximize over sky position of template
-        return SBankComputeMatchMaxSkyLoc(hp, hc,
-                                          hphccorr, proposal,
-                                          workspace_cache[0],
-                                          workspace_cache[1],
-                                          phase_maximized=False)
+        return SBankComputeMatchSkyLoc(hp, hc,
+                                       hphccorr, proposal,
+                                       workspace_cache[0],
+                                       workspace_cache[1],
+                                       phase_maximized=False)
 
 
 class EOBNRHigherOrderModeTemplate(IMRPrecessingSpinTemplate,
