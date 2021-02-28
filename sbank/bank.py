@@ -25,7 +25,7 @@ from six.moves import range
 import numpy as np
 
 from lal.iterutils import inorder, uniq
-from .overlap import SbankWorkspaceCache
+from .overlap import SBankWorkspaceCache
 from .psds import get_neighborhood_ASD, get_PSD, get_neighborhood_df_fmax
 from . import waveforms
 
@@ -74,7 +74,7 @@ class Bank(object):
             self.compute_match = self._metric_match
         else:
             # The max over skyloc stuff needs a second cache
-            self._workspace_cache = [SbankWorkspaceCache(),
+            self._workspace_cache = [SBankWorkspaceCache(),
                                      SBankWorkspaceCache()]
             self.compute_match = self._brute_match
 

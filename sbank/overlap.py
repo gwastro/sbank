@@ -5,12 +5,12 @@
 # to use the GPU if needed (although it will likely be more complicated than
 # that if the waveforms were not generated on the GPU)
 
-from .overlap_cpu import SBankCythonComputeMatch,
-from .overlap_cpu import SbankWorkspaceCache as CPUWorkspaceCache
+from .overlap_cpu import SBankCythonComputeMatch
+from .overlap_cpu import SBankWorkspaceCache as CPUWorkspaceCache
 
 # If considering enabling the GPU code, need to switch this as well.
 # Currently the GPU WorkspaceCache will not work and would need some fixing.
-SbankWorkspaceCache = CPUWorkspaceCache
+SBankWorkspaceCache = CPUWorkspaceCache
 
 def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
     """
