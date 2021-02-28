@@ -377,7 +377,7 @@ class AlignedSpinTemplate(object):
         match the length of the ASD, so its normalization depends on
         its own length.
         """
-        if not self._wf.has_key(df):
+        if not df in self._wf:
             wf = self._compute_waveform(df, self.f_final)
             if ASD is None:
                 ASD = PSD**0.5
