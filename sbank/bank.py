@@ -183,7 +183,10 @@ class Bank(object):
         df_end, f_max = get_neighborhood_df_fmax(tmpbank + [proposal], self.flow)
         if self.fhigh_max:
             f_max = min(f_max, self.fhigh_max)
-        df_start = max(df_end, self.iterative_match_df_max)
+        if self.iterative_match_df_max is not None:
+            df_start = max(df_end, self.iterative_match_df_max)
+        else:
+            df_start = df_end
 
         # find and test matches
         for tmplt in tmpbank:
