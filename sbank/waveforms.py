@@ -452,28 +452,13 @@ class IMRPhenomBTemplate(IMRAlignedSpinTemplate):
     approximant = "IMRPhenomB"
     param_names = ("m1", "m2", "chieff")
     param_formats = ("%.2f", "%.2f", "%+.2f")
-    def _compute_waveform(self, df, f_final):
-        return lalsim.SimIMRPhenomBGenerateFD(0, df,
-            self.m1 * MSUN_SI, self.m2 * MSUN_SI,
-            self.chieff, self.flow, f_final, 1000000 * PC_SI)
 
 
 class IMRPhenomCTemplate(IMRPhenomBTemplate):
     approximant = "IMRPhenomC"
-    def _compute_waveform(self, df, f_final):
-        return lalsim.SimIMRPhenomCGenerateFD(
-            0, df,
-            self.m1 * MSUN_SI, self.m2 * MSUN_SI,
-            self.chieff, self.flow, f_final, 1000000 * PC_SI)
 
 class IMRPhenomDTemplate(IMRAlignedSpinTemplate):
     approximant = "IMRPhenomD"
-    def _compute_waveform(self, df, f_final):
-        return lalsim.SimIMRPhenomDGenerateFD(
-            0, 0, df, # ref phase, ref frequency, df
-            self.m1 * MSUN_SI, self.m2 * MSUN_SI,
-            self.spin1z, self.spin2z,
-            self.flow, f_final, 1000000 * PC_SI, None)
 
     def _get_dur(self):
         dur = lalsim.SimIMRPhenomDChirpTime(self.m1 * MSUN_SI,
