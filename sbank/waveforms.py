@@ -28,7 +28,7 @@ from lal import MSUN_SI, MTSUN_SI, PC_SI, PI
 from lal import CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
 from glue.ligolw.lsctables import SnglInspiralTable as gluesit
 
-from .overlap import SbankComputeMatchSkyLoc, SBankComputeMatch
+from .overlap import SBankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD
 from .tau0tau3 import m1m2_to_tau0tau3
 
