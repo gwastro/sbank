@@ -41,7 +41,7 @@ class SnglInspiralTable(gluesit):
         gluesit.__init__(self, *args, **kwargs)
         for entry in _sit_cols.keys():
             if not(hasattr(self, entry)):
-                if _sit_cols[entry] in ['real_4','real_8']:
+                if _sit_cols[entry] in ['real_4', 'real_8']:
                     setattr(self, entry, 0.)
                 elif _sit_cols[entry] == 'int_4s':
                     setattr(self, entry, 0)
@@ -73,10 +73,10 @@ def project_hplus_hcross(hplus, hcross, theta, phi, psi):
     Fc += np.cos(theta)*np.sin(2*phi)*np.cos(2*psi)
 
     # form strain signal in detector
-    # hoft = lal.CreateCOMPLEX16FrequncySeries("h(t)", hplus.epoch, hplus.f0, hplus.deltaF, lal.lalSecondUnit, hplus.data.length)
     hplus.data.data = Fp*hplus.data.data + Fc*hcross.data.data
 
     return hplus
+
 
 def compute_sigmasq(htilde, deltaF):
     """
@@ -84,6 +84,7 @@ def compute_sigmasq(htilde, deltaF):
     """
     # vdot is dot with complex conjugation
     return float(np.vdot(htilde, htilde).real * 4 * deltaF)
+
 
 def compute_correlation(htilde1, htilde2, deltaF):
     """
@@ -555,8 +556,7 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
                     "the inclusion of all PN terms currently known. "
                     "If using the metric, the implementation in PyCBC, which "
                     "gets terms directly from lalsimulation, and so "
-                    "automatically stays up to date, is more accurate."
-                   )
+                    "automatically stays up to date, is more accurate.")
         logging.warn(warn_msg)
         AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
                                      flow=flow, duration=duration)
@@ -619,8 +619,8 @@ class TaylorF2Template(InspiralAlignedSpinTemplate):
 
     def _compute_waveform(self, df, f_final):
         phi0 = 0  # This is a reference phase, and not an intrinsic parameter
-        LALpars=lal.CreateDict()
-        approx = lalsim.GetApproximantFromString( self.approx_name )
+        LALpars = lal.CreateDict()
+        approx = lalsim.GetApproximantFromString(self.approx_name)
         hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
                 self.m1*MSUN_SI, self.m2*MSUN_SI,
                 0., 0., self.spin1z,
@@ -895,7 +895,7 @@ class SpinTaylorF2Template(InspiralPrecessingSpinTemplate):
     def __init__(self, m1, m2, spin1x, spin1y, spin1z,
                  theta, phi, iota, psi, orb_phase, bank, flow=None,
                  duration=None):
-        super(SpinTaylorF2Template, self).__init__(m1, m2, spin1x, spin1y
+        super(SpinTaylorF2Template, self).__init__(m1, m2, spin1x, spin1y,
                                                    spin1z, 0, 0, 0, theta, phi,
                                                    iota, psi, orb_phase, bank,
                                                    flow=flow, duration=None)
@@ -1008,7 +1008,7 @@ class EOBNRHigherOrderModeAmpMaxTemplate(IMRPrecessingSpinTemplate):
 
     def brute_match(self, other, df, workspace_cache, **kwargs):
 
-        tmplt =  self.get_whitened_normalized(df, **kwargs)
+        tmplt = self.get_whitened_normalized(df, **kwargs)
         proposal = other.get_whitened_normalized(df, **kwargs)
 
         # maximize over amplitude of template only
@@ -1032,8 +1032,8 @@ waveforms = {
     "SEOBNRv2": SEOBNRv2Template,
     "SEOBNRv2_ROM_DoubleSpin": SEOBNRv2ROMDoubleSpinTemplate,
     "SEOBNRv2_ROM_DoubleSpin_HI": SEOBNRv2ROMDoubleSpinHITemplate,
-    "SEOBNRv4" : SEOBNRv4ROMTemplate,
-    "SEOBNRv4_ROM" : SEOBNRv4ROMTemplate,
+    "SEOBNRv4": SEOBNRv4ROMTemplate,
+    "SEOBNRv4_ROM": SEOBNRv4ROMTemplate,
     "EOBNRv2": EOBNRv2Template,
     "SpinTaylorT4": SpinTaylorT4Template,
     "SpinTaylorT5": SpinTaylorT5Template,
