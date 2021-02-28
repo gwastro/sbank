@@ -8,9 +8,9 @@ cdef extern from "overlap_cpu_lib.c":
     WS *SBankCreateWorkspaceCache()
     void SBankDestroyWorkspaceCache(WS *workspace_cache)
     double _SBankComputeMatch(float complex *inj, float complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache)
-    double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache)
-    double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2)
-    double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2)
+    double _SBankComputeRealMatch(float complex *inj, float complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache)
+    double _SBankComputeMatchMaxSkyLoc(float complex *hp, float complex *hc, const double hphccorr, float complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2)
+    double _SBankComputeMatchMaxSkyLocNoPhase(float complex *hp, float complex *hc, const double hphccorr, float complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2)
 
 
 # WARNING: Handling C pointers in python gets nasty. The workspace item is
