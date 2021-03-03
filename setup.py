@@ -9,6 +9,7 @@ import numpy
 from pathlib import Path
 
 from setuptools import setup, Extension
+from Cython.Build import cythonize
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
@@ -38,13 +39,17 @@ ext = Extension("sbank.overlap_cpu",
                 language='c',
                 libraries=['lal'],
                 extra_compile_args=cython_compile_args,
-                extra_link_args=[],
-                compiler_directives={'embedsignature': True})
+                extra_link_args=[])
 exts.append(ext)
+
+cython_directives = {
+    'embedsignature': True,
+    'language_level': 3
+}
 
 # this function only manually specifies things that aren't
 # supported by setup.cfg (as of setuptools-30.3.0)
 setup(
     version=find_version(Path('sbank') / "__init__.py"),
-    ext_modules=exts,
+    ext_modules=cythonize(exts, compiler_directives=cython_directives),
 )
