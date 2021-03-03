@@ -21,11 +21,7 @@
 #include <math.h>
 #include <complex.h>
 #include <sys/types.h>
-#include <lal/AVFactories.h>
-#include <lal/ComplexFFT.h>
-#include <lal/XLALError.h>
-#include <lal/FrequencySeries.h>
-#include <lal/LALAtomicDatatypes.h>
+#include <overlap_cpu_lib_lalheaders.h>
 
 typedef struct tagWS {
     size_t n;
@@ -42,9 +38,9 @@ double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double d
 
 double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, double delta_f, WS *workspace_cache);
 
-double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const REAL8 hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
+double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
-double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const REAL8 hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
+double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
 #define MAX_NUM_WS 32  /* maximum number of workspaces */
 #define CHECK_OOM(ptr, msg) if (!(ptr)) { XLALPrintError((msg)); XLAL_ERROR_NULL(XLAL_ENOMEM); }
@@ -87,11 +83,11 @@ static WS *get_workspace(WS *workspace_cache, const size_t n) {
     /* if n not in cache, ptr now points at first blank entry */
     ptr->zf = XLALCreateCOMPLEX8Vector(n);
     CHECK_OOM(ptr->zf->data, "unable to allocate workspace array zf\n");
-    memset(ptr->zf->data, 0, n * sizeof(COMPLEX8));
+    memset(ptr->zf->data, 0, n * sizeof(float complex));
 
     ptr->zt = XLALCreateCOMPLEX8Vector(n);
     CHECK_OOM(ptr->zf->data, "unable to allocate workspace array zt\n");
-    memset(ptr->zt->data, 0, n * sizeof(COMPLEX8));
+    memset(ptr->zt->data, 0, n * sizeof(float complex));
 
     ptr->n = n;
     ptr->plan = XLALCreateReverseCOMPLEX8FFTPlan(n, 1);
@@ -101,7 +97,7 @@ static WS *get_workspace(WS *workspace_cache, const size_t n) {
 }
 
 /* by default, complex arithmetic will call built-in function __muldc3, which does a lot of error checking for inf and nan; just do it manually */
-static void multiply_conjugate(COMPLEX8 * restrict out, COMPLEX8 *a, COMPLEX8 *b, const size_t size) {
+static void multiply_conjugate(float complex * restrict out, float complex *a, float complex *b, const size_t size) {
     size_t k = 0;
     for (;k < size; ++k) {
         const float ar = crealf(a[k]);
@@ -113,14 +109,14 @@ static void multiply_conjugate(COMPLEX8 * restrict out, COMPLEX8 *a, COMPLEX8 *b
     }
 }
 
-static double abs_real(const COMPLEX8 x) {
-    const REAL8 re = crealf(x);
+static double abs_real(const float complex x) {
+    const double re = crealf(x);
     return re;
 }
 
-static double abs2(const COMPLEX8 x) {
-    const REAL8 re = crealf(x);
-    const REAL8 im = cimagf(x);
+static double abs2(const float complex x) {
+    const double re = crealf(x);
+    const double im = cimagf(x);
     return re * re + im * im;
 }
 
@@ -152,12 +148,12 @@ double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double d
     XLALCOMPLEX8VectorFFT(ws->zt, ws->zf, ws->plan); /* plan is reverse */
 
     /* maximize over |z(t)|^2 */
-    COMPLEX8 *zdata = ws->zt->data;
+    float complex *zdata = ws->zt->data;
     size_t k = n;
     ssize_t argmax = -1;
-    REAL8 max = 0.;
+    double max = 0.;
     for (;k--;) {
-        REAL8 temp = abs2(zdata[k]);
+        double temp = abs2(zdata[k]);
         if (temp > max) {
             argmax = k;
             max = temp;
@@ -166,7 +162,7 @@ double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double d
     if (max == 0.) return 0.;
 
     /* refine estimate of maximum */
-    REAL8 result;
+    double result;
     if (argmax == 0 || argmax == (ssize_t) n - 1)
         result = max;
     else
@@ -199,11 +195,11 @@ double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, doub
     XLALCOMPLEX8VectorFFT(ws->zt, ws->zf, ws->plan); /* plan is reverse */
 
     /* maximize over |Re z(t)| */
-    COMPLEX8 *zdata = ws->zt->data;
+    float complex *zdata = ws->zt->data;
     size_t k = n;
-    REAL8 max = 0.;
+    double max = 0.;
     for (;k--;) {
-	REAL8 temp = abs_real((zdata[k]));
+	double temp = abs_real((zdata[k]));
 	if (temp > max) {
 	    max = temp;
 	}
@@ -248,32 +244,32 @@ double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphcco
     /* COMPUTE DETECTION STATISTIC */
 
     /* First start with constant values */
-    REAL8 delta = 2 * hphccorr;
-    REAL8 denom = 4 - delta * delta;
+    double delta = 2 * hphccorr;
+    double denom = 4 - delta * delta;
     if (denom < 0)
     {
         fprintf(stderr, "DANGER WILL ROBINSON: CODE IS BROKEN!!\n");
     }
 
     /* Now the tricksy bit as we loop over time*/
-    COMPLEX8 *hpdata = ws1->zt->data;
-    COMPLEX8 *hcdata = ws2->zt->data;
+    float complex *hpdata = ws1->zt->data;
+    float complex *hcdata = ws2->zt->data;
     size_t k = n;
     /* FIXME: This is needed if we turn back on peak refinement. */
     /*ssize_t argmax = -1;*/
-    REAL8 max = 0.;
+    double max = 0.;
     for (;k--;) {
-        COMPLEX8 ratio = hcdata[k] / hpdata[k];
-        REAL8 ratio_real = creal(ratio);
-        REAL8 ratio_imag = cimag(ratio);
-        REAL8 beta = 2 * ratio_real;
-        REAL8 alpha = ratio_real * ratio_real + ratio_imag * ratio_imag;
-        REAL8 sqroot = alpha*alpha + alpha * (delta*delta - 2) + 1;
+        double complex ratio = hcdata[k] / hpdata[k];
+        double ratio_real = creal(ratio);
+        double ratio_imag = cimag(ratio);
+        double beta = 2 * ratio_real;
+        double alpha = ratio_real * ratio_real + ratio_imag * ratio_imag;
+        double sqroot = alpha*alpha + alpha * (delta*delta - 2) + 1;
         sqroot += beta * (beta - delta * (1 + alpha));
         sqroot = sqrt(sqroot);
-        REAL8 brckt = 2*(alpha + 1) - beta*delta + 2*sqroot;
+        double brckt = 2*(alpha + 1) - beta*delta + 2*sqroot;
         brckt = brckt / denom;
-        REAL8 det_stat_sq = abs2(hpdata[k]) * brckt;
+        double det_stat_sq = abs2(hpdata[k]) * brckt;
 
         if (det_stat_sq > max) {
             /*argmax = k;*/
@@ -283,7 +279,7 @@ double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphcco
     if (max == 0.) return 0.;
 
     /* FIXME: For now do *not* refine estimate of peak. */
-    /* REAL8 result;
+    /* double result;
     if (argmax == 0 || argmax == (ssize_t) n - 1)
         result = max;
     else
@@ -321,20 +317,20 @@ double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double
     /* COMPUTE DETECTION STATISTIC */
 
     /* First start with constant values */
-    REAL8 denom = 1. - (hphccorr*hphccorr);
+    double denom = 1. - (hphccorr*hphccorr);
     if (denom < 0)
     {
         fprintf(stderr, "DANGER WILL ROBINSON: CODE IS BROKEN!!\n");
     }
 
     /* Now the tricksy bit as we loop over time*/
-    COMPLEX8 *hpdata = ws1->zt->data;
-    COMPLEX8 *hcdata = ws2->zt->data;
+    float complex *hpdata = ws1->zt->data;
+    float complex *hcdata = ws2->zt->data;
     size_t k = n;
     /* FIXME: This is needed if we turn back on peak refinement. */
     /*ssize_t argmax = -1;*/
-    REAL8 max = 0.;
-    REAL8 det_stat_sq;
+    double max = 0.;
+    double det_stat_sq;
 
     for (;k--;) {
         det_stat_sq = creal(hpdata[k])*creal(hpdata[k]);
@@ -351,7 +347,7 @@ double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double
     if (max == 0.) return 0.;
 
     /* FIXME: For now do *not* refine estimate of peak. */
-    /* REAL8 result;
+    /* double result;
     if (argmax == 0 || argmax == (ssize_t) n - 1)
         result = max;
     else
