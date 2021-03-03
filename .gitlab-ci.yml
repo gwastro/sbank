@@ -62,17 +62,14 @@ tarball:
 test:python3.6:
   extends:
     - .test
-  image: python:3.6
 
 test:python3.7:
   extends:
     - .test
-  image: python:3.7
 
 test:python3.8:
   extends:
     - .test
-  image: python:3.8
 
 # -- lint -------------------
 
