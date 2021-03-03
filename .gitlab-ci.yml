@@ -34,7 +34,7 @@ tarball:
     # configure conda
     - !reference [".conda:base", before_script]
     # take the python version from the job name suffix
-    - PYTHON_VERSION=${CI_JOB_NAME##*:}
+    - PYTHON_VERSION=${CI_JOB_NAME#test:python}
     # create a conda environment to test in
     - conda create --name test --yes --quiet
           python=${PYTHON_VERSION}
@@ -56,8 +56,8 @@ tarball:
           $(which lalapps_cbc_sbank) --help
   after_script:
     # print coverage report
-    - python -m coverage report
-    - python -m coverage xml -o coverage.xml
+    - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage report
+    - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage xml -o coverage.xml
 
 test:python3.6:
   extends:
