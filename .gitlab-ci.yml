@@ -1,9 +1,9 @@
 include:
   - project: computing/gitlab-ci-templates
     file:
+      - /conda/base.yml
       - /python/build.yml
       - /python/lint.yml
-      - /python/test.yml
 
 stages:
   - dist
@@ -17,26 +17,37 @@ tarball:
     - .python:dist
   image: python:3
   stage: dist
+  script:
+    - python -m build . --sdist --outdir .
 
 # -- test -------------------
 
 .test:
   extends:
-    - .python:pytest
+    - .conda:base
   variables:
     GIT_STRATEGY: none
   stage: test
-  image: python
   needs:
     - tarball
   before_script:
+    # configure conda
+    - !reference [.conda:base, before_script]
+    # take the python version from the job name suffix
+    - PYTHON_VERSION=${CI_JOB_NAME##*:}
+    # create a conda environment to test in
+    - conda create --name test --yes --quiet
+          python=${PYTHON_VERSION}
+          c-compiler
+          cython
+          fftw
+          liblal
+    - conda activate test
     # install package and its dependencies
     - python -m pip install sbank-*.tar.gz
     # install other dependencies (including those for testing)
     - tar --wildcards --strip-components 1 -xf sbank-*.tar.gz */requirements.txt
     - python -m pip install -r requirements.txt
-    # force numpy <1.20.0a0 for lalsuite <=6.81
-    - python -m pip install "numpy<1.20.0a0"
   script:
     # run command-line script(s)
     - python -m coverage run
