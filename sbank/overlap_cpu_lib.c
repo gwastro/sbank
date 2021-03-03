@@ -22,23 +22,22 @@
 #include <complex.h>
 #include <sys/types.h>
 
-/* #include <overlap_cpu_lib_lalheaders.h> */
-/* ---------------- STUFF NEEDED ----------------- */
-#include <lal/LALDatatypes.h>
+/* ---------------- LAL STUFF NEEDED ----------------- */
+typedef struct tagCOMPLEX8Vector {
+     uint32_t length; /**< Number of elements in array. */
+     float complex *data; /**< Pointer to the data array. */
+} COMPLEX8Vector;
 
-COMPLEX8Vector * XLALCreateCOMPLEX8Vector ( UINT4 length );
+COMPLEX8Vector * XLALCreateCOMPLEX8Vector ( uint32_t length );
 void XLALDestroyCOMPLEX8Vector ( COMPLEX8Vector * vector );
 
 typedef struct tagCOMPLEX8FFTPlan COMPLEX8FFTPlan;
 
-COMPLEX8FFTPlan * XLALCreateReverseCOMPLEX8FFTPlan( UINT4 size, int measurelvl );
+COMPLEX8FFTPlan * XLALCreateReverseCOMPLEX8FFTPlan( uint32_t size, int measurelvl );
 
 void XLALDestroyCOMPLEX8FFTPlan( COMPLEX8FFTPlan *plan );
 
 /* ----------------------------------------------- */
-
-
-typedef struct tagCOMPLEX8FFTPlan COMPLEX8FFTPlan;
 
 typedef struct tagWS {
     size_t n;
