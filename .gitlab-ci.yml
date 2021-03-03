@@ -32,7 +32,7 @@ tarball:
     - tarball
   before_script:
     # configure conda
-    - !reference [.conda:base, before_script]
+    - !reference [".conda:base", before_script]
     # take the python version from the job name suffix
     - PYTHON_VERSION=${CI_JOB_NAME##*:}
     # create a conda environment to test in
