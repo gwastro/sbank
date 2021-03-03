@@ -21,7 +21,11 @@
 #include <math.h>
 #include <complex.h>
 #include <sys/types.h>
-#include <overlap_cpu_lib_lalheaders.h>
+#include <lal/FrequencySeries.h>
+#include <lal/LALAtomicDatatypes.h>
+#include <lal/ComplexFFT.h>
+
+/* #include <overlap_cpu_lib_lalheaders.h> */
 
 typedef struct tagWS {
     size_t n;
@@ -43,7 +47,7 @@ double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphcco
 double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double hphccorr, complex *proposal, size_t min_len, double delta_f, WS *workspace_cache1, WS *workspace_cache2);
 
 #define MAX_NUM_WS 32  /* maximum number of workspaces */
-#define CHECK_OOM(ptr, msg) if (!(ptr)) { XLALPrintError((msg)); XLAL_ERROR_NULL(XLAL_ENOMEM); }
+#define CHECK_OOM(ptr, msg) if (!(ptr)) { XLALPrintError((msg)); exit(-1); }
 
 /*
  * set up workspaces
@@ -138,7 +142,7 @@ double _SBankComputeMatch(complex *inj, complex *tmplt, size_t min_len, double d
     WS *ws = get_workspace(workspace_cache, n);
     if (!ws) {
         XLALPrintError("out of space in the workspace_cache\n");
-        XLAL_ERROR_REAL8(XLAL_ENOMEM);
+        exit(-1);
     }
 
     /* compute complex SNR time-series in freq-domain, then time-domain */
@@ -185,7 +189,7 @@ double _SBankComputeRealMatch(complex *inj, complex *tmplt, size_t min_len, doub
     WS *ws = get_workspace(workspace_cache, n);
     if (!ws) {
         XLALPrintError("out of space in the workspace_cache\n");
-	XLAL_ERROR_REAL8(XLAL_ENOMEM);
+	exit(-1);
     }
 
     /* compute complex SNR time-series in freq-domain, then time-domain */
@@ -223,12 +227,12 @@ double _SBankComputeMatchMaxSkyLoc(complex *hp, complex *hc, const double hphcco
     WS *ws1 = get_workspace(workspace_cache1, n);
     if (!ws1) {
         XLALPrintError("out of space in the workspace_cache\n");
-        XLAL_ERROR_REAL8(XLAL_ENOMEM);
+        exit(-1);
     }
     WS *ws2 = get_workspace(workspace_cache2, n);
     if (!ws2) {
         XLALPrintError("out of space in the workspace_cache\n");
-        XLAL_ERROR_REAL8(XLAL_ENOMEM);
+        exit(-1);
     }
 
 
@@ -296,12 +300,12 @@ double _SBankComputeMatchMaxSkyLocNoPhase(complex *hp, complex *hc, const double
     WS *ws1 = get_workspace(workspace_cache1, n);
     if (!ws1) {
         XLALPrintError("out of space in the workspace_cache\n");
-        XLAL_ERROR_REAL8(XLAL_ENOMEM);
+        exit(-1);
     }
     WS *ws2 = get_workspace(workspace_cache2, n);
     if (!ws2) {
         XLALPrintError("out of space in the workspace_cache\n");
-        XLAL_ERROR_REAL8(XLAL_ENOMEM);
+        exit(-1);
     }
 
 
