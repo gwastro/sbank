@@ -21,11 +21,24 @@
 #include <math.h>
 #include <complex.h>
 #include <sys/types.h>
-#include <lal/FrequencySeries.h>
-#include <lal/LALAtomicDatatypes.h>
-#include <lal/ComplexFFT.h>
 
 /* #include <overlap_cpu_lib_lalheaders.h> */
+/* ---------------- STUFF NEEDED ----------------- */
+#include <lal/LALDatatypes.h>
+
+COMPLEX8Vector * XLALCreateCOMPLEX8Vector ( UINT4 length );
+void XLALDestroyCOMPLEX8Vector ( COMPLEX8Vector * vector );
+
+typedef struct tagCOMPLEX8FFTPlan COMPLEX8FFTPlan;
+
+COMPLEX8FFTPlan * XLALCreateReverseCOMPLEX8FFTPlan( UINT4 size, int measurelvl );
+
+void XLALDestroyCOMPLEX8FFTPlan( COMPLEX8FFTPlan *plan );
+
+/* ----------------------------------------------- */
+
+
+typedef struct tagCOMPLEX8FFTPlan COMPLEX8FFTPlan;
 
 typedef struct tagWS {
     size_t n;
