@@ -83,6 +83,10 @@ test:python3.8:
   extends:
     - .test
 
+test:python3.9:
+  extends:
+    - .test
+
 # -- lint -------------------
 
 .lint-stage:
