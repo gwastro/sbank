@@ -10,3 +10,6 @@ coverage:
     patch:
       default:
         target: 90
+
+ignore:
+  - "sbank/overlap_cpu.c"
