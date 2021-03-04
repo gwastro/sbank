@@ -95,7 +95,7 @@ jobs:
       run: conda list --name test
 
     - name: Run test suite
-      run: python -m pytest -ra --color yes --pyargs sbank --cov sbank --junitxml=pytest.xml
+      run: python -m pytest -ra --color yes --pyargs sbank --cov sbank --cov-report= --junitxml=pytest.xml
 
     - name: Run command-line tests
       run: |
