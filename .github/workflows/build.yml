@@ -82,19 +82,20 @@ jobs:
 
     - name: Install SBank
       # notes:
+      # - `--coverage` enables coverage reporting for the C library
       # - CYTHON_LINETRACE=1 enables coverage reporting for the Cython library
       # - we use `--editable .` so that the Cython library is installed in-place,
       #   which helps with the coverage
       # - `-vv` gives us verbose output for the compilation,
       # - `--no-build-isolation` tells pip not to ignore the already-installed
       #   build requirements, which greatly cuts down on the output from `-vv`
-      run: CYTHON_LINETRACE=1 python -m pip install --editable . --no-build-isolation -vv
+      run: CFLAGS="${CFLAGS} --coverage" CYTHON_LINETRACE=1 python -m pip install --editable . --no-build-isolation -vv
 
     - name: Package list
       run: conda list --name test
 
     - name: Run test suite
-      run: python -m pytest -ra --color yes --pyargs sbank --cov sbank --junitxml=pytest.xml
+      run: python -m pytest -ra --color yes --pyargs sbank --cov sbank --cov-report= --junitxml=pytest.xml
 
     - name: Run command-line tests
       run: |
@@ -108,10 +109,15 @@ jobs:
     - name: Coverage report
       run: python -m coverage report --show-missing
 
+    - name: Prepare codecov upload
+      run: |
+        # covert report to XML (codecov can't handle sqlite, probably)
+        python -m coverage xml
+        rm -fv .coverage
+
     - name: Publish coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       with:
-        files: .coverage
         flags: ${{ runner.os }},python${{ matrix.python-version }}
 
     - name: Upload test results

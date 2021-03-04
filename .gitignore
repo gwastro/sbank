@@ -22,7 +22,6 @@ var/
 *.egg
 MANIFEST
 Portfile
-.coverage
 .eggs/
 
 # Installer logs
@@ -43,3 +42,8 @@ pip-delete-this-directory.txt
 # py.test cache dir
 /.cache
 /.pytest_cache/
+
+# coverage files
+.coverage
+coverage.xml
+*.gcov
