@@ -32,6 +32,8 @@ tarball:
   needs:
     - tarball
   before_script:
+    # clean workdir (just in case)
+    - rm -rfv sbank/
     # configure conda
     - !reference [".conda:base", before_script]
     - conda config --file ${CONDARC} --add channels conda-forge
@@ -51,14 +53,17 @@ tarball:
     # install package and its dependencies
     - python -m pip install sbank-*.tar.*
     # install other dependencies (including those for testing)
-    - tar --wildcards --strip-components 1 -xf sbank-*.tar.gz */requirements.txt
+    - tar --wildcards --strip-components 1 -xf sbank-*.tar.* */requirements.txt
     - python -m pip install -r requirements.txt
   script:
     # run command-line script(s)
-    - python -m coverage run
-          --append
-          --source=sbank
-          $(which lalapps_cbc_sbank) --help
+    - |
+      for script in ${CONDA_PREFIX}/bin/lalapps_cbc_sbank*; do
+          python -m coverage run \
+              --append \
+              --source=sbank \
+              ${CONDA_PREFIX}/bin/${script} --help
+      done
   after_script:
     # print coverage report
     - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage report
