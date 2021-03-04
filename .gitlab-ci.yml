@@ -62,7 +62,7 @@ tarball:
           python -m coverage run \
               --append \
               --source=sbank \
-              ${CONDA_PREFIX}/bin/${script} --help
+              ${script} --help
       done
   after_script:
     # print coverage report
