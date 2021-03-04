@@ -1,0 +1,111 @@
+# -----------------------
+#
+# Run a full build-and-test from the git repo
+# using a combination of conda and pip to install
+# all optional dependencies.
+#
+# This is the 'full' test suite.
+#
+# -----------------------
+
+name: Build and test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  conda:
+    name: Python ${{ matrix.python-version }} (${{ matrix.os }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macOS
+          - Ubuntu
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+    runs-on: ${{ matrix.os }}-latest
+
+    # this is needed for conda environments to activate automatically
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+    - name: Get source code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Cache conda packages
+      uses: actions/cache@v1
+      env:
+        # increment to reset cache
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ matrix.python-version}}-${{ env.CACHE_NUMBER }}
+
+    - name: Configure conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: test
+        channels: conda-forge
+        python-version: ${{ matrix.python-version }}
+        # this is needed for caching to work properly:
+        use-only-tar-bz2: true
+
+    - name: Conda info
+      run: conda info --all
+
+    - name: Install build dependencies
+      run: |
+        conda install --quiet --yes \
+            c-compiler \
+            cython \
+            liblal \
+            numpy \
+            pip \
+            setuptools \
+        ;
+
+    - name: Install SBank
+      # we modify CFLAGS here to include coverage for the C library
+      run: CFLAGS="--coverage -fprofile-abs-path ${CFLAGS}" ./venv/bin/python -m pip install --editable . --no-build-isolation -vv
+
+    - name: Package list
+      run: conda list --name test
+
+    - name: Run command-line tests
+      run: |
+        for script in ${CONDA_PREFIX}/bin/lalapps_cbc_sbank*; do
+            python -m coverage run \
+                --append \
+                --source=sbank \
+                ${script} --help
+        done
+
+    - name: Coverage report
+      run: python -m coverage report --show-missing
+
+    - name: Publish coverage to Codecov
+      uses: codecov/codecov-action@v1.2.1
+      with:
+        functionalities: gcov,coveragepy
+        flags: ${{ runner.os }},python${{ matrix.python-version }}
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: pytest-${{ matrix.os }}-${{ matrix.python-version }}
+        path: pytest.xml
