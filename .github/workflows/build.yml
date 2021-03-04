@@ -94,7 +94,7 @@ jobs:
       run: conda list --name test
 
     - name: Run test suite
-      run: python -m pytest -ra --color yes --cov sbank --pyargs sbank --junitxml=pytest.xml
+      run: python -m pytest -ra --color yes --pyargs sbank --cov sbank --cov-report=xml --junitxml=pytest.xml
 
     - name: Run command-line tests
       run: |
@@ -111,6 +111,7 @@ jobs:
     - name: Publish coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       with:
+        files: coverage.xml
         flags: ${{ runner.os }},python${{ matrix.python-version }}
 
     - name: Upload test results
