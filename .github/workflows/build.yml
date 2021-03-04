@@ -90,6 +90,9 @@ jobs:
     - name: Package list
       run: conda list --name test
 
+    - name: Run test suite
+      run: python -m pytest -ra --color yes --cov sbank --pyargs sbank --junitxml=pytest.xml
+
     - name: Run command-line tests
       run: |
         for script in ${CONDA_PREFIX}/bin/lalapps_cbc_sbank*; do
