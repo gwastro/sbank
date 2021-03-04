@@ -135,10 +135,10 @@ if opts.use_gpu_match:
 fake_xmldoc = ligolw.Document()
 fake_xmldoc.appendChild(ligolw.LIGO_LW())
 opts_dict = dict((k, v) for k, v in opts.__dict__.iteritems() if v is not False and v is not None)
-#process = ligolw_process.register_to_xmldoc(fake_xmldoc, "lalapps_cbc_sbank_sim", FIXME
+#process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim", FIXME
 #    opts_dict, version=git_version.tag or git_version.id, FIXME
 #    cvs_repository="sbank", cvs_entry_time=git_version.date) FIXME
-process = ligolw_process.register_to_xmldoc(fake_xmldoc, "lalapps_cbc_sbank_sim",
+process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim",
     opts_dict, version="no version",
     cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
 

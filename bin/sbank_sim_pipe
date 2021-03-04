@@ -109,7 +109,7 @@ class InspinjNode(pipeline.CondorDAGNode):
 
 class BankSimJob(inspiral.InspiralAnalysisJob):
     def __init__(self, cp, dax=False, tag_base ="banksim"):
-        exec_name = 'lalapps_cbc_sbank_sim'
+        exec_name = 'sbank_sim'
         extension = 'xml'
         sections = ['banksim']
         inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension,dax)
@@ -140,8 +140,8 @@ class BankSimNode(pipeline.CondorDAGNode):
 
 
 class PlotSimJob(inspiral.InspiralAnalysisJob):
-    def __init__(self, cp, dax=False, tag_base="lalapps_cbc_sbank_plot_sim"):
-        exec_name = 'lalapps_cbc_sbank_plot_sim'
+    def __init__(self, cp, dax=False, tag_base="sbank_plot_sim"):
+        exec_name = 'sbank_plot_sim'
         extension = 'h5'
         sections = []
         inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension,dax)
@@ -167,20 +167,20 @@ class PlotSimNode(pipeline.CondorDAGNode):
 
 usage = """
 
-lalapps_cbc_sbank_sim_pipe generates a DAG for parallelizing the
- verification of template banks via lalapps_cbc_sbank_sim. Its primary
+sbank_sim_pipe generates a DAG for parallelizing the
+ verification of template banks via sbank_sim. Its primary
  input is an ini file, which takes form given below. Once you have an
  ini file, create the DAG by
 
-lalapps_cbc_sbank_sim_pipe --config-file INIFILE.ini --user-tag SBANK_PIPE
+sbank_sim_pipe --config-file INIFILE.ini --user-tag SBANK_PIPE
 
 ;;; BEGIN EXAMPLE INI ;;;
 
 [condor] ; This section points to the executables, and provides condor options
 universe = vanilla
-lalapps_cbc_sbank_sim = /home/sprivite/local/opt/master/bin/lalapps_cbc_sbank_sim
-lalapps_cbc_sbank_plot_sim = /home/sprivite/local/opt/master/bin/lalapps_cbc_sbank_plot_sim
-lalapps_inspinj = /home/sprivite/local/opt/master/bin/lalapps_inspinj
+sbank_sim = /usr/bin/sbank_sim
+sbank_plot_sim = /usr/bin/sbank_plot_sim
+lalapps_inspinj = /usr/bin/lalapps_inspinj
 
 ;[accounting]
 ;accounting-group = ???

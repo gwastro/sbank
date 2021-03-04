@@ -51,7 +51,7 @@ lsctables.use_in(ContentHandler)
 
 usage = """
 
-lalapps_cbc_sbank: This program generates a template bank for compact
+sbank: This program generates a template bank for compact
 binary searches covering a given region of mass and spin parameter
 space. The program supports the waveform approximants listed below and
 is designed to be easily extensible to other waveform approximants as
@@ -66,7 +66,7 @@ Example command lines:
 inspiral-merger-ringdown binary black hole waveforms for use in an
 aLIGO search.
 
-lalapps_cbc_sbank --approximant IMRPhenomD --aligned-spin \\
+sbank --approximant IMRPhenomD --aligned-spin \\
         --mass1-min 15.0 --mass1-max 25.0 \\
         --spin1-min 0.0 --spin1-max 0.5 \\
         --match-min 0.97 --flow 20.0 --noise-model aLIGOZeroDetHighPower \\
@@ -78,7 +78,7 @@ highly spinning black holes using inspiral-only waveforms for use in
 an aLIGO search. Approximate the match calculation using the
 semi-analytic expression for the overlap metric.
 
-lalapps_cbc_sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
+sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
         --mass1-min 1.0 --mass1-max 2.0 \\
         --mass2-min 5.0 --mass1-max 10.0 \\
         --spin1-min 0.0 --spin1-max 0.05 \\
@@ -92,7 +92,7 @@ inspiral-only waveforms for use in an aLIGO search. Approximate the
 match calculation using the semi-analytic expression for the overlap
 metric.
 
-lalapps_cbc_sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
+sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
         --mass1-min 1.0 --mass1-max 2.0 \\
         --spin1-min 0.0 --spin1-max 0.05 \\
         --match-min 0.97 --flow 20.0 --noise-model aLIGOZeroDetHighPower \\
@@ -104,7 +104,7 @@ BNS, NSBH and BBH systems. Objects lighter than 2 solar masses are considered
 neutron stars. Objects heavier than 2 solar masses are considered black holes.
 Use appropriate spin limits based on the type of the object.
 
-lalapps_cbc_sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
+sbank --approximant TaylorF2RedSpin --aligned-spin --use-metric \\
         --mass1-min 1 --mass1-max 10 \\
         --mass2-min 1 --mass2-max 10 \\
         --mtotal-max 10 \\
@@ -119,7 +119,7 @@ For large parameter spaces with many templates, it is recommended that
 you split the space into smaller sub-regions and ligolw_add the
 resulting banks. One can also seed the template placement process with
 a pre-generated bank, produced for instance by lalapps_tmpltbank, and
-SBank will fill in whichever gaps remain. See also lalapps_cbc_sbank_pipe.
+SBank will fill in whichever gaps remain. See also sbank_pipe.
 """ % '\n\t'.join(sorted(waveforms.keys()))
 
 
@@ -459,7 +459,7 @@ else:
 opts_dict = dict((k, v) for k, v in opts.__dict__.items()
                  if v is not False and v is not None)
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
-    process = ligolw_process.register_to_xmldoc(xmldoc, "lalapps_cbc_sbank",
+    process = ligolw_process.register_to_xmldoc(xmldoc, "sbank",
         opts_dict, version="no version",
         cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
 

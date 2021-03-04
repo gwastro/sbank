@@ -86,8 +86,8 @@ class bank_DAG(pipeline.CondorDAG):
 
 
 class SBankJob(inspiral.InspiralAnalysisJob):
-    def __init__(self,cp,dax=False, tag_base="lalapps_cbc_sbank"):
-        exec_name = 'lalapps_cbc_sbank'
+    def __init__(self,cp,dax=False, tag_base="sbank"):
+        exec_name = 'sbank'
         extension = 'xml'
         sections = ['sbank']
         inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension,dax)
@@ -127,8 +127,8 @@ class SBankNode(pipeline.CondorDAGNode):
 
 
 class SBankChooseMchirpBoundariesJob(inspiral.InspiralAnalysisJob):
-    def __init__(self,cp,dax=False, tag_base="lalapps_cbc_sbank_choose_mchirp_boundaries"):
-        exec_name = 'lalapps_cbc_sbank_choose_mchirp_boundaries'
+    def __init__(self,cp,dax=False, tag_base="sbank_choose_mchirp_boundaries"):
+        exec_name = 'sbank_choose_mchirp_boundaries'
         extension = 'txt'
         sections = ['split']
         inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension,dax)
@@ -203,19 +203,19 @@ class LWAddNode(pipeline.CondorDAGNode):
 
 usage = """
 
-lalapps_cbc_sbank_pipe generates a DAG for parallelizing the
-construction of template banks via lalapps_cbc_sbank. Its primary
+sbank_pipe generates a DAG for parallelizing the
+construction of template banks via sbank. Its primary
 input is an ini file, which takes form given below. Once you have an
 ini file, create the DAG by
 
-lalapps_cbc_sbank_pipe --config-file INIFILE.ini --user-tag SBANK_PIPE
+sbank_pipe --config-file INIFILE.ini --user-tag SBANK_PIPE
 
 ;;; BEGIN EXAMPLE INI ;;;
 
 [condor] ; This section points to the executables, and provides condor options
 universe = vanilla
-lalapps_cbc_sbank = /home/sprivite/local/opt/master/bin/lalapps_cbc_sbank
-lalapps_cbc_sbank_choose_mchirp_boundaries = /home/sprivite/local/opt/master/bin/lalapps_cbc_sbank_choose_mchirp_boundaries
+sbank = /usr/bin/sbank
+sbank_choose_mchirp_boundaries = /usr/bin/sbank_choose_mchirp_boundaries
 
 ;[accounting]
 ;accounting-group = ???
