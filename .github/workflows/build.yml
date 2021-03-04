@@ -107,7 +107,12 @@ jobs:
         done
 
     - name: Coverage report
-      run: python -m coverage report --show-missing
+      run: |
+        # covert report to XML (codecov can't handle sqlite, probably)
+        python -m coverage xml
+        rm -fv .coverage
+        # print the report
+        python -m coverage report --show-missing
 
     - name: Publish coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
