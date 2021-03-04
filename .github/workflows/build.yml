@@ -71,12 +71,14 @@ jobs:
       run: |
         conda install --quiet --yes \
             c-compiler \
+            coverage \
             cython \
             liblal \
             numpy \
             pip \
             setuptools \
         ;
+        python -m pip install -r requirements.txt
 
     - name: Install SBank
       # notes:
