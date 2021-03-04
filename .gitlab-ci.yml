@@ -24,6 +24,7 @@ tarball:
 
 .test:
   extends:
+    - .python:pytest
     - .conda:base
   variables:
     GIT_STRATEGY: none
