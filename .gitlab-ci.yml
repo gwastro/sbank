@@ -4,6 +4,7 @@ include:
       - /conda/base.yml
       - /python/build.yml
       - /python/lint.yml
+      - /python/test.yml
 
 stages:
   - dist
