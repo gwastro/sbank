@@ -87,7 +87,7 @@ if __name__ == "__main__":
     flow = 30 # FIXME
 
     # derived quantities
-    # NB: Named fields in dtypes (see ligolw_table_to_array in lalapps_cbc_sbank_sim)
+    # NB: Named fields in dtypes (see ligolw_table_to_array in sbank_sim)
     # allow dict-like access to columns: e.g. arr["mass1"].
     min_match = match[int(floor(len(match)*0.9))]
     inj_M = inj_arr["mass1"] + inj_arr["mass2"] #total mass

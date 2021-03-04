@@ -99,7 +99,7 @@ jobs:
 
     - name: Run command-line tests
       run: |
-        for script in ${CONDA_PREFIX}/bin/lalapps_cbc_sbank*; do
+        for script in ${CONDA_PREFIX}/bin/sbank*; do
             python -m coverage run \
                 --append \
                 --source=sbank \

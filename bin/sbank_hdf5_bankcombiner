@@ -28,7 +28,7 @@ import numpy
 import h5py
 
 __author__  = "Ian Harry <ian.harry@ligo.org>"
-__program__ = "lalapps_cbc_sbank_hdf5_bankcombiner"
+__program__ = "sbank_hdf5_bankcombiner"
 
 parser = argparse.ArgumentParser(description=__doc__[1:])
 parser.add_argument("--output-file", type=str,
