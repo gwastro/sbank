@@ -435,6 +435,7 @@ class IMRAlignedSpinTemplate(AlignedSpinTemplate):
     implementations of IMR aligned spin templates should sub-class
     this class.
     """
+
     def _get_dur(self):
         return self._get_imr_dur()
 
@@ -498,7 +499,7 @@ class SEOBNRv2Template(IMRAlignedSpinTemplate):
         seff = lalsim.SimIMRPhenomBComputeChi(self.m1, self.m2,
                                               self.spin1z, self.spin2z)
         dur = lalsim.SimIMRSEOBNRv2ChirpTimeSingleSpin(
-                self.m1 * MSUN_SI, self.m2 * MSUN_SI, seff, self.flow)
+            self.m1 * MSUN_SI, self.m2 * MSUN_SI, seff, self.flow)
         # add a 10% to be consistent with PyCBC's duration estimate,
         # may want to FIXME if that changes
         return dur * 1.1
@@ -517,8 +518,8 @@ class SEOBNRv4Template(IMRAlignedSpinTemplate):
 
     def _get_dur(self):
         dur = lalsim.SimIMRSEOBNRv4ROMTimeOfFrequency(
-                self.flow, self.m1 * MSUN_SI, self.m2 * MSUN_SI,
-                self.spin1z, self.spin2z)
+            self.flow, self.m1 * MSUN_SI, self.m2 * MSUN_SI,
+            self.spin1z, self.spin2z)
         # Allow a 10% margin of error
         return dur * 1.1
 
@@ -607,9 +608,9 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
         dx0 = other._theta0 - self._theta0
         dx1 = other._theta3 - self._theta3
         dx2 = other._theta3s - self._theta3s
-        match = 1 - (g00 * dx0 * dx0 + 2 * g01 * dx0 * dx1 +
-                     2 * g02 * dx0 * dx2 + g11 * dx1 * dx1 +
-                     2 * g12 * dx1 * dx2 + g22 * dx2 * dx2)
+        match = 1 - (g00 * dx0 * dx0 + 2 * g01 * dx0 * dx1
+                     + 2 * g02 * dx0 * dx2 + g11 * dx1 * dx1
+                     + 2 * g12 * dx1 * dx2 + g22 * dx2 * dx2)
 
         return match
 
@@ -622,13 +623,13 @@ class TaylorF2Template(InspiralAlignedSpinTemplate):
         LALpars = lal.CreateDict()
         approx = lalsim.GetApproximantFromString(self.approx_name)
         hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
-                self.m1*MSUN_SI, self.m2*MSUN_SI,
-                0., 0., self.spin1z,
-                0., 0., self.spin2z,
-                1.e6*PC_SI, 0., phi0,
-                0., 0., 0.,
-                df, self.flow, f_final, self.flow,
-                LALpars, approx)
+            self.m1*MSUN_SI, self.m2*MSUN_SI,
+            0., 0., self.spin1z,
+            0., 0., self.spin2z,
+            1.e6*PC_SI, 0., phi0,
+            0., 0., 0.,
+            df, self.flow, f_final, self.flow,
+            LALpars, approx)
 
         # Must set values greater than _get_f_final to 0
         act_f_max = self._get_f_final()
@@ -868,6 +869,7 @@ class IMRPrecessingSpinTemplate(PrecessingSpinTemplate):
     implementations of IMR precessing spin templates should sub-class
     this class.
     """
+
     def _get_dur(self):
         return self._get_imr_dur()
 
@@ -882,6 +884,7 @@ class InspiralPrecessingSpinTemplate(PrecessingSpinTemplate):
     implementations of inspiral-only precessing spin templates should sub-class
     this class.
     """
+
     def _get_dur(self):
         return self._get_chirp_dur()
 
@@ -902,8 +905,8 @@ class SpinTaylorF2Template(InspiralPrecessingSpinTemplate):
 
     def _compute_waveform_comps(self, df, f_final):
         hplus_fd, hcross_fd = \
-          super(SpinTaylorF2Template, self)._compute_waveform_comps(df,
-                                                                    f_final)
+            super(SpinTaylorF2Template, self)._compute_waveform_comps(df,
+                                                                      f_final)
         # Must set values greater than _get_f_final to 0
         act_f_max = self._get_f_final()
         f_max_idx = int(act_f_max / df + 0.999)
@@ -980,6 +983,7 @@ class HigherOrderModeTemplate(PrecessingSpinTemplate):
 
     Uses maximization over sky-location and amplitude, but *not* phase.
     """
+
     def brute_match(self, other, df, workspace_cache, **kwargs):
 
         # Template generates hp and hc

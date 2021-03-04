@@ -99,4 +99,3 @@ flake8:
     - .python:flake8
     - .lint-stage
   needs: []
-  allow_failure: true

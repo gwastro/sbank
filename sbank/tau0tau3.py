@@ -28,19 +28,22 @@ from lal import PI, MTSUN_SI
 # functions for converting between m1-m2 and tau0-tau3 coords
 #
 
+
 def A0(flow):
     '''
     A0 is a conversion factor between tau0 and mchirp, defined in eqn
     B3 of the appendix of arxiv.org/abs/0706.4437
     '''
-    return 5./(256*(PI * flow)**(8./3)) # eqn B3
+    return 5./(256*(PI * flow)**(8./3))  # eqn B3
+
 
 def A3(flow):
     '''
     A3 is a conversion factor between tau3 and tau0*M, defined in eqn
     B3 of the appendix of arxiv.org/abs/0706.4437
     '''
-    return PI/(8*(PI*flow)**(5./3)) # eqn B3
+    return PI/(8*(PI*flow)**(5./3))  # eqn B3
+
 
 def tau0tau3_to_m1m2(tau0, tau3, flow):
     '''
@@ -48,13 +51,14 @@ def tau0tau3_to_m1m2(tau0, tau3, flow):
     '''
     # compute mtotal in seconds
     mtotal = 5. / (32 * PI * PI * flow) * (tau3 / tau0)
-    eta = ( A0(flow) / tau0 ) * mtotal**(-5./3)
+    eta = (A0(flow) / tau0) * mtotal**(-5./3)
 
     # convert to solar masses
     mtotal /= MTSUN_SI
     m1 = mtotal * (0.5 + (0.25 - eta)**0.5)
 
     return m1, mtotal - m1
+
 
 def m1m2_to_tau0tau3(m1, m2, flow):
     '''
@@ -69,8 +73,8 @@ def m1m2_to_tau0tau3(m1, m2, flow):
     eta = m1_s * m2_s / (mtotal * mtotal)
 
     # eqn B4 for tau0,tau3
-    tau0 = ( A0(flow) / eta ) * mtotal**(-5./3)
-    tau3 = ( A3(flow) / eta ) * mtotal**(-2./3)
+    tau0 = (A0(flow) / eta) * mtotal**(-5./3)
+    tau3 = (A3(flow) / eta) * mtotal**(-2./3)
 
     return tau0, tau3
 
@@ -119,19 +123,21 @@ def set_default_constraints(constraints):
     # mratio can be given or inferred from component mass limits
     qmin, qmax = constraints.setdefault('mratio', (None, None))
     if qmin is None or qmin < mass1_min/mass2_max:
-        qmin = max(mass1_min/mass2_max, 1) # q = m1/m2 > 1 by convention
+        qmin = max(mass1_min/mass2_max, 1)  # q = m1/m2 > 1 by convention
     if qmin < 1:
         raise ValueError("We use the convention that q = m1/m2 > 1.")
     if qmax is None or min(mass1_max, mtotal_max - mass2_min) / mass2_min < qmax:
-        qmax = min(mass1_max, mtotal_max - mass2_min) / mass2_min # q = m1/m2 by convention
+        qmax = min(mass1_max, mtotal_max - mass2_min) / mass2_min  # q = m1/m2 by convention
     constraints['mratio'] = (qmin, qmax)
 
     # mchirp can be given or inferred from component mass limits
     mcmin, mcmax = constraints.setdefault('mchirp', (None, None))
     if mcmin is None:
-        mcmin = min(m1m2_to_mchirp(m1, m2) for m1 in (mass1_min, mass1_max) for m2 in (mass2_min, mass2_max))
+        mcmin = min(m1m2_to_mchirp(m1, m2) for m1 in (mass1_min, mass1_max)
+                    for m2 in (mass2_min, mass2_max))
     if mcmax is None:
-        mcmax = max(m1m2_to_mchirp(m1, m2) for m1 in (mass1_min, mass1_max) for m2 in (mass2_min, mass2_max))
+        mcmax = max(m1m2_to_mchirp(m1, m2) for m1 in (mass1_min, mass1_max)
+                    for m2 in (mass2_min, mass2_max))
     constraints['mchirp'] = (mcmin, mcmax)
 
     # update mtotal constraints based on mchirp cuts one can show that
@@ -145,27 +151,35 @@ def set_default_constraints(constraints):
 
     return constraints
 
-def m1m2_to_mratio(m1,m2):
+
+def m1m2_to_mratio(m1, m2):
     return m1/m2
 
-def m1m2_to_m1(m1,m2):
+
+def m1m2_to_m1(m1, m2):
     return m1
 
-def m1m2_to_m2(m1,m2):
+
+def m1m2_to_m2(m1, m2):
     return m2
 
-def m1m2_to_mtotal(m1,m2):
+
+def m1m2_to_mtotal(m1, m2):
     return m1+m2
 
-def m1m2_to_mchirp(m1,m2):
+
+def m1m2_to_mchirp(m1, m2):
     return (m1 * m1 * m1 * m2 * m2 * m2 / (m1 + m2))**0.2
 
-m1m2_mappings = { \
-    "mratio":m1m2_to_mratio,
-    "mass1":m1m2_to_m1,
-    "mass2":m1m2_to_m2,
-    "mtotal":m1m2_to_mtotal,
-    "mchirp":m1m2_to_mchirp}
+
+m1m2_mappings = {
+    "mratio": m1m2_to_mratio,
+    "mass1": m1m2_to_m1,
+    "mass2": m1m2_to_m2,
+    "mtotal": m1m2_to_mtotal,
+    "mchirp": m1m2_to_mchirp,
+}
+
 
 def allowed_m1m2(m1, m2, m1m2_constraints, tol=1e-10):
     '''
@@ -175,14 +189,14 @@ def allowed_m1m2(m1, m2, m1m2_constraints, tol=1e-10):
     for param in m1m2_constraints.keys():
 
         # get the constraints
-        mn,mx = m1m2_constraints[param]
+        mn, mx = m1m2_constraints[param]
 
         # don't bother if there aren't any constraints
         if mn is None and mx is None:
             continue
 
         # otherwise compute surviving pairs
-        params = m1m2_mappings[param](m1,m2)
+        params = m1m2_mappings[param](m1, m2)
         if mn is None:
             include = (params <= mx + tol)
         elif mx is None:
@@ -193,17 +207,21 @@ def allowed_m1m2(m1, m2, m1m2_constraints, tol=1e-10):
         m1 = m1[include]
         m2 = m2[include]
 
-    return m1,m2
+    return m1, m2
 
 # Copied out of pycbc.pnutils
+
+
 def mtotal_eta_to_mass1_mass2(m_total, eta):
     mass1 = 0.5 * m_total * (1.0 + (1.0 - 4.0 * eta)**0.5)
     mass2 = 0.5 * m_total * (1.0 - (1.0 - 4.0 * eta)**0.5)
-    return mass1,mass2
+    return mass1, mass2
+
 
 def mchirp_eta_to_mass1_mass2(m_chirp, eta):
     M = m_chirp / (eta**(3./5.))
     return mtotal_eta_to_mass1_mass2(M, eta)
+
 
 def mchirpm1_to_m2(mc, m1, tol=1e-6):
     # solve cubic for m2
@@ -219,9 +237,10 @@ def mchirpm1_to_m2(mc, m1, tol=1e-6):
     elif len(rts) == 1:
         m2 = rts[0]
     else:
-        raise ValueError("No unique real solution for m2 found for mchirp=%f and m1=%f"%(mc, m1))
+        raise ValueError("No unique real solution for m2 found for mchirp=%f and m1=%f" % (mc, m1))
 
     return m2
+
 
 def tau0tau3_bound(flow, **constraints):
     '''
@@ -236,7 +255,7 @@ def tau0tau3_bound(flow, **constraints):
     # code to get stuck if the resultant box has no extent.
 
     # ensure we can at least bound the region in m1-m2
-    constraints = set_default_constraints( constraints )
+    constraints = set_default_constraints(constraints)
 
     # controls delta-m resolution
     # FIXME: As this is discrete, this can cause the bank sizes to be smaller
@@ -287,8 +306,10 @@ def tau0tau3_bound(flow, **constraints):
             mcmax_minm2 = m2min
         if mcmax_maxm2 > m2max:
             mcmax_maxm2 = m2max
-        m1m2_points += [(m1, mchirpm1_to_m2(mcmax, m1)) for m1 in numpy.linspace(mcmax_minm1, mcmax_maxm1, npts)]
-        m1m2_points += [(mchirpm1_to_m2(mcmax, m2), m2) for m2 in numpy.linspace(mcmax_minm2, mcmax_maxm2, npts)]
+        m1m2_points += [(m1, mchirpm1_to_m2(mcmax, m1))
+                        for m1 in numpy.linspace(mcmax_minm1, mcmax_maxm1, npts)]
+        m1m2_points += [(mchirpm1_to_m2(mcmax, m2), m2)
+                        for m2 in numpy.linspace(mcmax_minm2, mcmax_maxm2, npts)]
 
     if mcmin is not None:
         mcmin_maxm1, mcmin_minm2 = mchirp_eta_to_mass1_mass2(mcmin, etamin)
@@ -301,8 +322,10 @@ def tau0tau3_bound(flow, **constraints):
             mcmin_minm2 = m2min
         if mcmin_maxm2 > m2max:
             mcmin_maxm2 = m2max
-        m1m2_points += [(m1, mchirpm1_to_m2(mcmin, m1)) for m1 in numpy.linspace(mcmin_minm1, mcmin_maxm1, npts)]
-        m1m2_points += [(mchirpm1_to_m2(mcmax, m2), m2) for m2 in numpy.linspace(mcmin_minm2, mcmin_maxm2, npts)]
+        m1m2_points += [(m1, mchirpm1_to_m2(mcmin, m1))
+                        for m1 in numpy.linspace(mcmin_minm1, mcmin_maxm1, npts)]
+        m1m2_points += [(mchirpm1_to_m2(mcmax, m2), m2)
+                        for m2 in numpy.linspace(mcmin_minm2, mcmin_maxm2, npts)]
 
     # filter these down to only those that satisfy ALL constraints
     m1 = numpy.array([i[0] for i in m1m2_points])
@@ -314,8 +337,8 @@ def tau0tau3_bound(flow, **constraints):
 
     # infer lower and upper tau0-tau3 constraints
     lims_tau0, lims_tau3 = m1m2_to_tau0tau3(m1, m2, flow)
-    lims_tau0 = [min( lims_tau0 ), max( lims_tau0 )]
-    lims_tau3 = [min( lims_tau3 ), max( lims_tau3 )]
+    lims_tau0 = [min(lims_tau0), max(lims_tau0)]
+    lims_tau3 = [min(lims_tau3), max(lims_tau3)]
 
     return lims_tau0, lims_tau3
 
@@ -367,7 +390,7 @@ def urand_tau0tau3_generator(flow, **constraints):
 
     Equivalently, use a dictionary with **:
     >>> urand_tau0tau3 = urand_tau0tau3_generator(40, **{"mass1": (1, 99), "mtotal": (55, 100), "mratio": (1, 10)})
-    """
+    """  # noqa: E501
     # check that minimal constraints are set and set defaults
     constraints = set_default_constraints(constraints)
 
@@ -399,10 +422,11 @@ def urand_tau0tau3_generator(flow, **constraints):
 
         mtot = A0_A3 * uniform(tau3_min, tau3_max) / tau0  # seconds
         eta = _A0 / tau0 * mtot**minus_five_thirds
-        if eta > 0.25: continue
+        if eta > 0.25:
+            continue
 
         mtot /= MTSUN_SI  # back to solar masses
-        mass1 = mtot * (0.5 + sqrt(0.25 - eta)) # mass1 is the larger component
+        mass1 = mtot * (0.5 + sqrt(0.25 - eta))  # mass1 is the larger component
         mass2 = mtot - mass1
 
         if mtotal_min < mtot < mtotal_max and \
@@ -411,18 +435,18 @@ def urand_tau0tau3_generator(flow, **constraints):
                 qmin < mass1/mass2 < qmax:
             yield mass1, mass2
 
+
 def nonspin_param_generator(flow, tmplt_class, bank, **constraints):
     """
     Wrapper for urand_tau0tau3_generator() to remove spin options
     for EOBNRv2 waveforms.
     """
-    if constraints.has_key('spin1'):
-        constraints.pop('spin1')
-    if constraints.has_key('spin2'):
-        constraints.pop('spin2')
+    constraints.pop('spin1', None)
+    constraints.pop('spin2', None)
 
     for mass1, mass2 in urand_tau0tau3_generator(flow, **constraints):
         yield tmplt_class(mass1, mass2, bank=bank)
+
 
 def IMRPhenomB_param_generator(flow, tmplt_class, bank, **kwargs):
     """
@@ -455,10 +479,10 @@ def IMRPhenomB_param_generator(flow, tmplt_class, bank, **kwargs):
     for mass1, mass2 in urand_tau0tau3_generator(flow, **kwargs):
         q = max(mass1/mass2, mass2/mass1)
         if 4 < q <= 10:
-            spin1 = uniform(*chi_high_bounds) #guaranteed to give chi in correct range
+            spin1 = uniform(*chi_high_bounds)  # guaranteed to give chi in correct range
             spin2 = uniform(*chi_high_bounds)
         elif 1 <= q <= 4:
-            spin1 = uniform(*chi_low_bounds) #guaranteed to give chi in correct range
+            spin1 = uniform(*chi_low_bounds)  # guaranteed to give chi in correct range
             spin2 = uniform(*chi_low_bounds)
         else:
             raise ValueError("mass ratio out of range")
@@ -477,7 +501,7 @@ def IMRPhenomC_param_generator(flow, tmplt_class, bank, **kwargs):
     @param tmplt_class: Template generation class for this waveform
     @param bank: sbank bank object
     @param kwargs: constraints on waveform parameters. See urand_tau0tau3_generator for more usage help. If no spin limits are specified, the IMRPhenomC limits will be used.
-    """
+    """  # noqa: E501
 
     # get spin limits. IMRPhenomC has special bounds on chi, so we
     # will silently truncate
@@ -545,6 +569,7 @@ def aligned_spin_param_generator(flow, tmplt_class, bank, **kwargs):
             continue
         yield t
 
+
 def double_spin_precessing_param_generator(flow, tmplt_class, bank, **kwargs):
     """
     Currently a stub to test precessing template generation.
@@ -575,12 +600,12 @@ def double_spin_precessing_param_generator(flow, tmplt_class, bank, **kwargs):
         yield tmplt_class(mass1, mass2, spin1x, spin1y, spin1z, spin2x, spin2y,
                           spin2z, theta, phi, iota, psi, orb_phase, bank=bank)
 
+
 def single_spin_precessing_param_generator(flow, tmplt_class, bank, **kwargs):
     """
     Currently a stub to test precessing template generation.
     """
     spin1_bounds = kwargs.pop('spin1', (0., 0.9))
-    spin2_bounds = kwargs.pop('spin2', (0., 0.9))
 
     for mass1, mass2 in urand_tau0tau3_generator(flow, **kwargs):
         # Choose the rest from hardcoded limits
@@ -610,10 +635,8 @@ def nonspin_hom_param_generator(flow, tmplt_class, bank, **constraints):
     Wrapper for urand_tau0tau3_generator() to remove spin options
     for EOBNRv2 waveforms.
     """
-    if constraints.has_key('spin1'):
-        constraints.pop('spin1')
-    if constraints.has_key('spin2'):
-        constraints.pop('spin2')
+    constraints.pop('spin1', None)
+    constraints.pop('spin2', None)
     for mass1, mass2 in urand_tau0tau3_generator(flow, **constraints):
         theta = uniform(0, numpy.pi)
         phi = uniform(0, 2*numpy.pi)
@@ -624,24 +647,26 @@ def nonspin_hom_param_generator(flow, tmplt_class, bank, **constraints):
                           theta, phi, iota, psi, orb_phase, bank)
 
 
-proposals = {"IMRPhenomB":IMRPhenomB_param_generator,
-             "IMRPhenomC":IMRPhenomC_param_generator,
-             "IMRPhenomD":aligned_spin_param_generator,
-             "TaylorF2": aligned_spin_param_generator,
-             "IMRPhenomP":double_spin_precessing_param_generator,
-             "IMRPhenomPv2":double_spin_precessing_param_generator,
-             "TaylorF2RedSpin":aligned_spin_param_generator,
-             "EOBNRv2":nonspin_param_generator,
-             "SEOBNRv1":aligned_spin_param_generator,
-             "SEOBNRv2":aligned_spin_param_generator,
-             "SEOBNRv2_ROM_DoubleSpin":aligned_spin_param_generator,
-             "SEOBNRv2_ROM_DoubleSpin_HI":aligned_spin_param_generator,
-             "SEOBNRv4" : aligned_spin_param_generator,
-             "SEOBNRv4_ROM" : aligned_spin_param_generator,
-             "SpinTaylorT4":SpinTaylorT4_param_generator,
-             "SpinTaylorF2":single_spin_precessing_param_generator,
-             "SpinTaylorT5Fourier":double_spin_precessing_param_generator,
-             "SEOBNRv3":double_spin_precessing_param_generator,
-             "EOBNRv2HM_ROM":nonspin_hom_param_generator,
-             "EOBNRv2HM_ROM_AmpMax":nonspin_hom_param_generator,
-             "EOBNRv2HM_ROM_PhaseMax":nonspin_hom_param_generator}
+proposals = {
+    "IMRPhenomB": IMRPhenomB_param_generator,
+    "IMRPhenomC": IMRPhenomC_param_generator,
+    "IMRPhenomD": aligned_spin_param_generator,
+    "TaylorF2": aligned_spin_param_generator,
+    "IMRPhenomP": double_spin_precessing_param_generator,
+    "IMRPhenomPv2": double_spin_precessing_param_generator,
+    "TaylorF2RedSpin": aligned_spin_param_generator,
+    "EOBNRv2": nonspin_param_generator,
+    "SEOBNRv1": aligned_spin_param_generator,
+    "SEOBNRv2": aligned_spin_param_generator,
+    "SEOBNRv2_ROM_DoubleSpin": aligned_spin_param_generator,
+    "SEOBNRv2_ROM_DoubleSpin_HI": aligned_spin_param_generator,
+    "SEOBNRv4": aligned_spin_param_generator,
+    "SEOBNRv4_ROM": aligned_spin_param_generator,
+    "SpinTaylorT4": SpinTaylorT4_param_generator,
+    "SpinTaylorF2": single_spin_precessing_param_generator,
+    "SpinTaylorT5Fourier": double_spin_precessing_param_generator,
+    "SEOBNRv3": double_spin_precessing_param_generator,
+    "EOBNRv2HM_ROM": nonspin_hom_param_generator,
+    "EOBNRv2HM_ROM_AmpMax": nonspin_hom_param_generator,
+    "EOBNRv2HM_ROM_PhaseMax": nonspin_hom_param_generator,
+}
