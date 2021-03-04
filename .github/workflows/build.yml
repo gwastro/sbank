@@ -79,8 +79,11 @@ jobs:
         ;
 
     - name: Install SBank
-      # we modify CFLAGS here to include coverage for the C library
-      run: CFLAGS="--coverage -fprofile-abs-path ${CFLAGS}" ./venv/bin/python -m pip install --editable . --no-build-isolation -vv
+      # notes:
+      # - we modify CFLAGS here to include coverage for the C library
+      # - we use `--editable .` so that the C library is installed in-place
+      #   which in turn means that the gcov reports are written in a readable place as well
+      run: CFLAGS="--coverage -fprofile-abs-path ${CFLAGS}" python -m pip install --editable . --no-build-isolation -vv
 
     - name: Package list
       run: conda list --name test
