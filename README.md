@@ -5,6 +5,6 @@
 ![Supported Python versions](https://img.shields.io/pypi/pyversions/sbank.svg)
 -->
 
-[![Build status](https://github.com/duncanmmacleod/sbank/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/duncanmmacleod/sbank/actions/workflows/build.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/344e160df91354762892/maintainability)](https://codeclimate.com/github/duncanmmacleod/sbank/maintainability)
-[![Coverage status](https://codecov.io/gh/duncanmmacleod/sbank/branch/master/graph/badge.svg)](https://codecov.io/gh/duncanmmacleod/sbank)
+[![Build status](https://github.com/gwastro/sbank/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gwastro/sbank/actions/workflows/build.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/1488c7bc13b82b49661d/maintainability)](https://codeclimate.com/github/gwastro/sbank/maintainability)
+[![Coverage status](https://codecov.io/gh/gwastro/sbank/branch/master/graph/badge.svg)](https://codecov.io/gh/gwastro/sbank)
