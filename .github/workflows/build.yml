@@ -73,7 +73,7 @@ jobs:
             c-compiler \
             coverage \
             cython \
-            liblal \
+            lalsuite \
             numpy \
             pip \
             setuptools \
@@ -105,7 +105,6 @@ jobs:
     - name: Publish coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       with:
-        functionalities: gcov,coveragepy
         flags: ${{ runner.os }},python${{ matrix.python-version }}
 
     - name: Upload test results
