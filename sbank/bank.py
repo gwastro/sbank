@@ -29,8 +29,10 @@ from .overlap import SBankWorkspaceCache
 from .psds import get_neighborhood_ASD, get_PSD, get_neighborhood_df_fmax
 from . import waveforms
 
+
 class lazy_nhoods(object):
     __slots__ = ("seq", "nhood_param")
+
     def __init__(self, seq, nhood_param="tau0"):
         self.seq = seq
         self.nhood_param = nhood_param
@@ -41,10 +43,12 @@ class lazy_nhoods(object):
     def __len__(self):
         return len(self.seq)
 
+
 class Bank(object):
 
-    def __init__(self, noise_model, flow, use_metric=False, cache_waveforms=False, nhood_size=1.0, nhood_param="tau0", coarse_match_df=None, iterative_match_df_max=None, fhigh_max=None, optimize_flow=None, flow_column=None):
-
+    def __init__(self, noise_model, flow, use_metric=False, cache_waveforms=False, nhood_size=1.0,
+                 nhood_param="tau0", coarse_match_df=None, iterative_match_df_max=None,
+                 fhigh_max=None, optimize_flow=None, flow_column=None):
         self.noise_model = noise_model
         self.flow = flow
         self.use_metric = use_metric
@@ -54,12 +58,16 @@ class Bank(object):
         self.optimize_flow = optimize_flow
         self.flow_column = flow_column
 
-        if self.coarse_match_df and self.iterative_match_df_max and self.coarse_match_df < self.iterative_match_df_max:
+        if (
+            self.coarse_match_df
+            and self.iterative_match_df_max
+            and self.coarse_match_df < self.iterative_match_df_max
+        ):
             # If this case occurs coarse_match_df offers no improvement, turn off
             self.coarse_match_df = None
 
         if fhigh_max is not None:
-            self.fhigh_max = (2**(np.ceil(np.log2( fhigh_max ))))
+            self.fhigh_max = (2**(np.ceil(np.log2(fhigh_max))))
         else:
             self.fhigh_max = fhigh_max
 
@@ -101,7 +109,9 @@ class Bank(object):
         if len(cls_args) > 1:
             return ValueError("bank parameters do not match")
         merged = cls(*cls_args)
-        merged._templates[:] = list(inorder(banks, key=attrgetter(merged.nhood_param)))
+        merged._templates[:] = list(
+            inorder(banks, key=attrgetter(merged.nhood_param))
+        )
         merged._nmatch = sum(b._nmatch for b in banks)
         return merged
 

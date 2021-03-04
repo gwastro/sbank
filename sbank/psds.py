@@ -15,26 +15,25 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from __future__ import division
+from math import (log, ceil)
 
-from math import log, ceil
+from numpy import (vectorize, arange, seterr, inf, ones_like)
 
-from numpy import vectorize, arange, seterr, inf, ones_like
-seterr(over="ignore")  # the PSD overflows frequently, but that's OK
-
-from glue.ligolw import param
-from glue.ligolw import utils
-from lal import series as lalseries
-import lal
 import lalsimulation as lalsim
+import lal
+from lal import series as lalseries
 
+from glue.ligolw import (param, utils)
+
+seterr(over="ignore")  # the PSD overflows frequently, but that's OK
 
 #
 # Analytical PSDs
 #
 noise_models = {
     "LIGOIPsd": vectorize(lambda f: lal.LIGOIPsd(f)),  # what most lalapps_* uses
-    "AdvLIGOPsd": vectorize(lambda f: 1e-49 * lal.AdvLIGOPsd(f)),  # what most lalapps_* uses; hasn't been XLALified, so doesn't have scaling factor. Gah!
+    # what most lalapps_* uses; hasn't been XLALified, so doesn't have scaling factor. Gah!
+    "AdvLIGOPsd": vectorize(lambda f: 1e-49 * lal.AdvLIGOPsd(f)),
     "iLIGOSRD": vectorize(lambda f: lalsim.SimNoisePSDiLIGOSRD(f)),
     "aLIGONoSRMLowPower": vectorize(lambda f: lalsim.SimNoisePSDaLIGONoSRMLowPower(f)),
     "aLIGONoSRMHighPower": vectorize(lambda f: lalsim.SimNoisePSDaLIGONoSRMHighPower(f)),
@@ -45,8 +44,9 @@ noise_models = {
     "aLIGOZeroDetHighPower": vectorize(lambda f: lalsim.SimNoisePSDaLIGOZeroDetHighPower(f)),
 }
 
-
 psd_cache = {}  # keyed by df, flow, f_max
+
+
 def get_PSD(df, flow, f_max, noise_model):
     """
     Return the frequency vector and sampled PSD using the noise_model,
@@ -61,7 +61,10 @@ def get_PSD(df, flow, f_max, noise_model):
     LIGO_PSD[ind_low:] = noise_model(f[ind_low:])
     return psd_cache.setdefault((df, flow, f_max), LIGO_PSD)
 
+
 asd_cache = {}
+
+
 def get_ASD(df, flow, f_max, noise_model):
     """
     Some routines prefer ASDs over PSDs. Keep cache of ASDs, but we may
@@ -75,11 +78,14 @@ def get_ASD(df, flow, f_max, noise_model):
 # Determine PSD for neighborhood
 #
 
+
 def next_pow2(n):
     return 1 << int(ceil(log(n, 2)))
 
+
 def prev_pow2(n):
     return 1 << int(log(n, 2))
+
 
 def get_neighborhood_df_fmax(waveforms, flow):
     """
@@ -97,6 +103,7 @@ def get_neighborhood_df_fmax(waveforms, flow):
     assert f_max - flow >= 2 * df  # need a few frequencies at least!
     return df, f_max
 
+
 def get_neighborhood_PSD(waveforms, flow, noise_model):
     """
     Return PSD that is optimized for this neighborhood, with small enough
@@ -112,6 +119,7 @@ def get_neighborhood_PSD(waveforms, flow, noise_model):
     f_max = next_pow2(max_ffinal)  # will always be greater than 1
     assert f_max - flow >= 2 * df  # need a few frequencies at least!
     return df, get_PSD(df, flow, f_max, noise_model)
+
 
 def get_neighborhood_ASD(waveforms, flow, noise_model):
     """
@@ -133,6 +141,7 @@ def get_neighborhood_ASD(waveforms, flow, noise_model):
 # Read PSD from arrays in XML documents
 #
 
+
 def psd_instrument_dict(elem):
     out = {}
     for lw in elem.getElementsByTagName(u"LIGO_LW"):
@@ -144,5 +153,8 @@ def psd_instrument_dict(elem):
         out[ifo] = lalseries.parse_REAL8FrequencySeries(lw)
     return out
 
-def read_psd(filename, verbose = False):
-    return psd_instrument_dict(utils.load_filename(filename, verbose = verbose, contenthandler=lalseries.PSDContentHandler))
+
+def read_psd(filename, verbose=False):
+    return psd_instrument_dict(
+        utils.load_filename(filename, verbose=verbose, contenthandler=lalseries.PSDContentHandler),
+    )
