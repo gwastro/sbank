@@ -44,6 +44,9 @@ tarball:
           cython
           fftw
           liblal
+          numpy
+          pip
+          setuptools
     - conda activate test
     # install package and its dependencies
     - python -m pip install sbank-*.tar.* --no-build-isolation -vv
