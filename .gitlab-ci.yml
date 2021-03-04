@@ -27,6 +27,7 @@ tarball:
     - .conda:base
   variables:
     GIT_STRATEGY: none
+    PIP_CACHE_DIR: ${CI_PROJECT_DIR}/.cache/pip
   stage: test
   needs:
     - tarball
@@ -45,7 +46,7 @@ tarball:
           liblal
     - conda activate test
     # install package and its dependencies
-    - python -m pip install sbank-*.tar.gz
+    - python -m pip install sbank-*.tar.* --no-build-isolation -vv
     # install other dependencies (including those for testing)
     - tar --wildcards --strip-components 1 -xf sbank-*.tar.gz */requirements.txt
     - python -m pip install -r requirements.txt
