@@ -33,6 +33,7 @@ tarball:
   before_script:
     # configure conda
     - !reference [".conda:base", before_script]
+    - conda config --file ${CONDARC} --add channels conda-forge
     # take the python version from the job name suffix
     - PYTHON_VERSION=${CI_JOB_NAME#test:python}
     # create a conda environment to test in
