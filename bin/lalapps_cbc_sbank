@@ -456,7 +456,8 @@ else:
 #
 # prepare process table with information about the current program
 #
-opts_dict = dict((k, v) for k, v in opts.__dict__.iteritems() if v is not False and v is not None)
+opts_dict = dict((k, v) for k, v in opts.__dict__.items()
+                 if v is not False and v is not None)
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
     process = ligolw_process.register_to_xmldoc(xmldoc, "lalapps_cbc_sbank",
         opts_dict, version="no version",

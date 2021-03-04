@@ -1,3 +1,4 @@
 include COPYING
 include bin/*
 include requirements.txt
+recursive-include sbank *.c *.pyx

@@ -1,6 +1,7 @@
 include:
   - project: computing/gitlab-ci-templates
     file:
+      - /conda/base.yml
       - /python/build.yml
       - /python/lint.yml
       - /python/test.yml
@@ -17,51 +18,76 @@ tarball:
     - .python:dist
   image: python:3
   stage: dist
+  script:
+    - python -m build . --sdist --outdir .
 
 # -- test -------------------
 
 .test:
   extends:
     - .python:pytest
+    - .conda:base
   variables:
     GIT_STRATEGY: none
+    PIP_CACHE_DIR: ${CI_PROJECT_DIR}/.cache/pip
   stage: test
-  image: python
   needs:
     - tarball
   before_script:
+    # clean workdir (just in case)
+    - rm -rfv sbank/
+    # configure conda
+    - !reference [".conda:base", before_script]
+    - conda config --file ${CONDARC} --add channels conda-forge
+    # take the python version from the job name suffix
+    - PYTHON_VERSION=${CI_JOB_NAME#test:python}
+    # create a conda environment to test in
+    - conda create --name test --yes --quiet
+          python=${PYTHON_VERSION}
+          c-compiler
+          cython
+          fftw
+          liblal
+          numpy
+          pip
+          setuptools
+    - conda activate test
     # install package and its dependencies
-    - python -m pip install sbank-*.tar.gz
+    - python -m pip install sbank-*.tar.*
     # install other dependencies (including those for testing)
-    - tar --wildcards --strip-components 1 -xf sbank-*.tar.gz */requirements.txt
+    - tar --wildcards --strip-components 1 -xf sbank-*.tar.* */requirements.txt
     - python -m pip install -r requirements.txt
-    # force numpy <1.20.0a0 for lalsuite <=6.81
-    - python -m pip install "numpy<1.20.0a0"
   script:
     # run command-line script(s)
-    - python -m coverage run
-          --append
-          --source=sbank
-          $(which lalapps_cbc_sbank) --help
+    - |
+      for script in ${CONDA_PREFIX}/bin/lalapps_cbc_sbank*; do
+          python -m coverage run \
+              --append \
+              --source=sbank \
+              ${script} --help
+      done
   after_script:
     # print coverage report
-    - python -m coverage report
-    - python -m coverage xml -o coverage.xml
+    - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage report
+    - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage xml -o coverage.xml
+    # clean unpacked conda packages (but keep the tarballs)
+    - find ${CI_PROJECT_DIR}/.cache/conda/pkgs -mindepth 1 -maxdepth 1 -type d -print -exec rm -rf {} \;
 
 test:python3.6:
   extends:
     - .test
-  image: python:3.6
 
 test:python3.7:
   extends:
     - .test
-  image: python:3.7
 
 test:python3.8:
   extends:
     - .test
-  image: python:3.8
+
+test:python3.9:
+  extends:
+    - .test
 
 # -- lint -------------------
 

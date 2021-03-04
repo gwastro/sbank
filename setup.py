@@ -5,9 +5,11 @@
 """
 
 import re
+import numpy
 from pathlib import Path
 
-from setuptools import setup
+from setuptools import setup, Extension
+from Cython.Build import cythonize
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
@@ -27,8 +29,27 @@ def find_version(path, varname="__version__"):
     raise RuntimeError("Unable to find version string.")
 
 
+exts = []
+cython_compile_args = ['-O3', '-w', '-ffast-math',
+                       '-ffinite-math-only']
+
+ext = Extension("sbank.overlap_cpu",
+                ["sbank/overlap_cpu.pyx"],
+                include_dirs=[numpy.get_include()],
+                language='c',
+                libraries=['lal'],
+                extra_compile_args=cython_compile_args,
+                extra_link_args=[])
+exts.append(ext)
+
+cython_directives = {
+    'embedsignature': True,
+    'language_level': 3
+}
+
 # this function only manually specifies things that aren't
 # supported by setup.cfg (as of setuptools-30.3.0)
 setup(
     version=find_version(Path('sbank') / "__init__.py"),
+    ext_modules=cythonize(exts, compiler_directives=cython_directives),
 )
