@@ -46,7 +46,7 @@ def log_path():
     if 'phys.uwm.edu' in host: return '/localscratch/' + username
     if 'aei.uni-hannover.de' in host: return '/local/user/' + username
     if 'phy.syr.edu' in host: return '/usr1/' + username
-    else: return os.environ["TMPDIR"]
+    else: return tempfile.gettempdir()
 
 class bank_DAG(pipeline.CondorDAG):
 
