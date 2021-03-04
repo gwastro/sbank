@@ -112,7 +112,6 @@ jobs:
     - name: Publish coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       with:
-        files: .coverage
         flags: ${{ runner.os }},python${{ matrix.python-version }}
 
     - name: Upload test results
