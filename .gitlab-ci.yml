@@ -68,8 +68,8 @@ tarball:
     # print coverage report
     - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage report
     - ${CI_PROJECT_DIR}/envs/test/bin/python -m coverage xml -o coverage.xml
-    # clean conda packages
-    - conda clean --packages --yes
+    # clean unpacked conda packages (but keep the tarballs)
+    - find ${CI_PROJECT_DIR}/.cache/conda/pkgs -mindepth 1 -maxdepth 1 -type d -print -exec rm -rf {} \;
 
 test:python3.6:
   extends:
