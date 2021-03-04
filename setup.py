@@ -4,6 +4,7 @@
 """Build configuration for sbank
 """
 
+import os
 import re
 import numpy
 from pathlib import Path
@@ -32,6 +33,14 @@ def find_version(path, varname="__version__"):
 exts = []
 cython_compile_args = ['-O3', '-w', '-ffast-math',
                        '-ffinite-math-only']
+cython_directives = {
+    'embedsignature': True,
+    'language_level': 3,
+}
+# if running in CI, enable coverage for cython
+if int(os.getenv("CYTHON_LINETRACE", "0")):
+    cython_directives["linetrace"] = True
+    cython_compile_args.append("-DCYTHON_TRACE")
 
 ext = Extension("sbank.overlap_cpu",
                 ["sbank/overlap_cpu.pyx"],
@@ -41,11 +50,6 @@ ext = Extension("sbank.overlap_cpu",
                 extra_compile_args=cython_compile_args,
                 extra_link_args=[])
 exts.append(ext)
-
-cython_directives = {
-    'embedsignature': True,
-    'language_level': 3
-}
 
 # this function only manually specifies things that aren't
 # supported by setup.cfg (as of setuptools-30.3.0)
