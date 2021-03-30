@@ -3,3 +3,10 @@ pytest
 pytest-cov
 numpy
 cython
+h5py
+lalsuite
+lscsoft-glue
+matplotlib
+python-ligo-lw
+scipy
+six
