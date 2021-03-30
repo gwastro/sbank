@@ -113,7 +113,7 @@ static WS *get_workspace(WS *workspace_cache, const size_t n) {
 }
 
 /* by default, complex arithmetic will call built-in function __muldc3, which does a lot of error checking for inf and nan; just do it manually */
-static void multiply_conjugate(float complex * out, float complex *a, float complex *b, const size_t size) {
+static void multiply_conjugate(float complex * restrict out, float complex *a, float complex *b, const size_t size) {
     size_t k = 0;
     for (;k < size; ++k) {
         const float ar = crealf(a[k]);
