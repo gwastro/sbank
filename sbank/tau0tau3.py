@@ -261,7 +261,7 @@ def tau0tau3_bound(flow, **constraints):
     # FIXME: As this is discrete, this can cause the bank sizes to be smaller
     # than expected. Raising this to 1e5, raising it higher starts to cause
     # slowdown as computing m2 from m1 and mchirp is expensive.
-    npts = 1e4
+    npts = int(1e4)
 
     # draw constant component mass lines
     m1min, m1max = constraints['mass1']
