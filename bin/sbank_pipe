@@ -326,7 +326,7 @@ coarse_thresh = cp.get("coarse-sbank", "convergence-threshold")
 coarse_sbank_node.add_var_arg("--convergence-threshold %s" % coarse_thresh)
 
 if cp.has_option("coarse-sbank", "max-new-templates"):
-    templates_max = cp.get("coarse-sbank", "max-new-templates")
+    templates_max = int(cp.get("coarse-sbank", "max-new-templates"))
     assert templates_max >= 3*nbanks # you need at least a few templates per bank
 else:
     templates_max = 15*nbanks  # to prevent the coarse bank from running forever
