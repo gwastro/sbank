@@ -477,7 +477,7 @@ if opts.trial_waveforms:
         hdf_fp = h5py.File(opts.trial_waveforms, 'r')
         num_points = len(hdf_fp['mass1'])
         proposal=[]
-        for idx in xrange(num_points):
+        for idx in range(num_points):
             # Reading one point in at a time from HDF for 2 million points can
             # be slow. Better to read in groups of points at a time and process
             # from there. 100000 points seems a reasonable setting to hard-code
