@@ -38,6 +38,7 @@ cython_compile_args = [
     "-w",
     "-ffast-math",
     "-ffinite-math-only",
+    "-std=c99",
 ]
 cython_directives = {
     "embedsignature": True,
