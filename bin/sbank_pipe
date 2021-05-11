@@ -343,7 +343,7 @@ mchirp_boundaries_fname, = sbankChooseMchirpBoundariesNode.get_output_files()
 
 # generate a bank for each mchirp region
 # first compute even numbered split banks
-for j in xrange(0, nbanks, 2):
+for j in range(0, nbanks, 2):
 
     bank_node = SBankNode(sbankJob, dag, "%s_SBANK_SPLIT_BANK_%04d" % (options.user_tag, j), seed="%d" % (j*nbanks+1), mchirp_boundaries_file=mchirp_boundaries_fname, mchirp_boundaries_index=str(j), p_node=[sbankChooseMchirpBoundariesNode], bank_seed=[xmlCoarse])
     bank_node.add_var_opt("match-min", mm)
@@ -353,14 +353,14 @@ for j in xrange(0, nbanks, 2):
     bank_names.append(bank_name)
 
 # then compute odd numbered split banks using even banks as seeds
-for j in xrange(1, nbanks, 2):
+for j in range(1, nbanks, 2):
 
     if j < nbanks - 1:
-        p_node = [bank_nodes[(j+1)/2], bank_nodes[(j+3)/2]]
-        bank_seed = [xmlCoarse, bank_names[(j+1)/2], bank_names[(j+3)/2]]
+        p_node = [bank_nodes[(j+1)//2], bank_nodes[(j+3)//2]]
+        bank_seed = [xmlCoarse, bank_names[(j+1)//2], bank_names[(j+3)//2]]
     else:
-        p_node = [bank_nodes[(j+1)/2]]
-        bank_seed = [xmlCoarse, bank_names[(j+1)/2]]
+        p_node = [bank_nodes[(j+1)//2]]
+        bank_seed = [xmlCoarse, bank_names[(j+1)//2]]
 
     bank_node = SBankNode(sbankJob, dag, "%s_SBANK_SPLIT_BANK_%04d" % (options.user_tag, j), seed="%d" % (j*nbanks+1), mchirp_boundaries_file=mchirp_boundaries_fname, mchirp_boundaries_index=str(j), p_node=p_node, bank_seed=bank_seed)
     bank_node.add_var_opt("match-min", mm)
