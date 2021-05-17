@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
+        os: [ubuntu-20.04]
 
     steps:
       - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
           # against the lal library. However, the lal library installed through
           # pip is hard to link against. This symlinks it into /usr/lib so
           # that it can be found.
-          CIBW_BEFORE_BUILD: ln -s `python -c 'import sys; print (sys.path[-1])'`/lalsuite.libs/liblal-*so* /usr/lib/liblal.so
+          CIBW_BEFORE_BUILD: bash tools/cibuildwheel_prep.sh
           CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
       - uses: actions/upload-artifact@v2
         with:
