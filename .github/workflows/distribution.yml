@@ -21,7 +21,11 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BEFORE_BUILD: pip install lalsuite
+          # This BEFORE_BUILD is a horrible hack. I need to be able to link
+          # against the lal library. However, the lal library installed through
+          # pip is hard to link against. This symlinks it into /usr/lib so
+          # that it can be found.
+          CIBW_BEFORE_BUILD: ln -s `python -c 'import sys; print (sys.path[-1])'`/lalsuite.libs/liblal-*so* /usr/lib/liblal.so
           CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
       - uses: actions/upload-artifact@v2
         with:
