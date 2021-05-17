@@ -50,6 +50,7 @@ jobs:
         path: ./
     - name: build pycbc for pypi
       run: |
+        pip install -r requirements.txt
         python setup.py sdist
         mv artifact/* dist/
     - name: Publish distribution 📦 to Test PyPI
