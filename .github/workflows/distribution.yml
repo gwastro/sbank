@@ -29,7 +29,7 @@ jobs:
           # lalsuite currently not available on python3.9. It should be in the
           # very near future though, so add cp39-* here when it is!
           CIBW_BUILD: cp36-* cp37-* cp38-*
-          COBW_ARCHS: auto64
+          CIBW_ARCHS: auto64
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
