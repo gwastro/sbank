@@ -1,3 +1,4 @@
+set -e
 # This is used in github actions when building the wheels for distribution.
 # Do not run this outside of that!
 pip install lalsuite
