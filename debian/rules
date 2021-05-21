@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/pkg-info.mk
+
+export PYBUILD_OPTION = --test-pytest
+export PYBUILD_TEST_ARGS = --color=yes
+export PYBUILD_AFTER_INSTALL = \
+	echo 'Automatically generating man pages with help2man' && \
+	mkdir -p {destdir}/usr/share/man/man1 && \
+	ls {destdir}/usr/bin/ | env PYTHONPATH={destdir}{install_dir} \
+	xargs --verbose -I @ \
+	help2man \
+		--section 1 \
+		--source $(DEB_SOURCE) \
+		--version-string $(DEB_VERSION_UPSTREAM) \
+		--no-info \
+		--no-discard-stderr \
+		--output {destdir}/usr/share/man/man1/@.1 \
+		{destdir}/usr/bin/@
+
+%:
+	dh $@ \
+	    --with python3 \
+	    --buildsystem=pybuild

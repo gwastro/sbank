@@ -1,0 +1,5 @@
+sbank (0.0.2-1) unstable; urgency=low
+
+  * first debian build
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Fri, 21 May 2021 11:22:00 +0100

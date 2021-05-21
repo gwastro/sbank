@@ -1,4 +1,6 @@
 include COPYING
 include bin/*
 include requirements.txt
+include python-sbank.spec
+recursive-include debian *
 recursive-include sbank *.c *.pyx
