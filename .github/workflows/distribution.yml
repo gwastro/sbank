@@ -1,0 +1,67 @@
+name: Build Wheels
+
+on: [push, pull_request]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Needs some work to make wheels also on macos
+        os: [ubuntu-20.04]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v2
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==1.9.0
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          # This BEFORE_BUILD is a horrible hack. I need to be able to link
+          # against the lal library. However, the lal library installed through
+          # pip is hard to link against. This symlinks it into /usr/lib so
+          # that it can be found.
+          CIBW_BEFORE_BUILD: bash tools/cibuildwheel_prep.sh
+          # lalsuite currently not available on python3.9. It should be in the
+          # very near future though, so add cp39-* here when it is!
+          CIBW_BUILD: cp36-* cp37-* cp38-*
+          CIBW_ARCHS: auto64
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+  deploy_pypi:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    runs-on: ubuntu-20.04
+    needs: build_wheels
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - uses: actions/download-artifact@v2
+      with:
+        path: ./
+    - name: build pycbc for pypi
+      run: |
+        pip install -r requirements.txt
+        python setup.py sdist
+        mv artifact/* dist/
+    - name: Publish distribution 📦 to Test PyPI
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.test_pypi_password }}
+        repository_url: https://test.pypi.org/legacy/
+    - name: Publish distribution 📦 to PyPI
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
