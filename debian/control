@@ -1,0 +1,73 @@
+# -- sbank source package ---
+
+Source: sbank
+Section: python
+Priority: optional
+Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
+Standards-Version: 4.2.1
+X-Python3-Version: >= 3.6
+Homepage: https://github.com/gwastro/sbank
+Build-Depends:
+ debhelper (>= 9),
+ dh-python,
+ cython3,
+ help2man,
+ lalapps,
+ liblal-dev,
+ python3-all,
+ python3-dev,
+ python3-glue,
+ python3-h5py,
+ python3-lal,
+ python3-lalsimulation,
+ python3-ligo-lw-bin,
+ python3-matplotlib,
+ python3-numpy,
+ python3-pytest,
+ python3-scipy,
+ python3-six,
+ python3-setuptools (>= 30.3.0),
+
+# -- python3-sbank ----------
+
+Package: python3-sbank
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ ${shlibs:Depends},
+ python3-glue,
+ python3-lal,
+ python3-lalsimulation,
+ python3-numpy,
+ python3-six,
+Description: Python 3 modules for Sbank
+ Sbank provides a library for generating template banks of compact binary
+ mergers for gravitational-wave searches using the "stochastic" placement
+ algorithm.
+ .
+ This package provides the Python 3 library.
+
+# -- sbank ------------------
+
+Package: sbank
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ lalapps,
+ python3-glue,
+ python3-h5py,
+ python3-lal,
+ python3-lalsimulation,
+ python3-ligo-lw-bin,
+ python3-matplotlib,
+ python3-numpy,
+ python3-sbank (= ${binary:Version}),
+ python3-scipy,
+Description: Command-line utilities for Sbank
+ Sbank provides a library for generating template banks of compact binary
+ mergers for gravitational-wave searches using the "stochastic" placement
+ algorithm.
+ .
+ This package provides the command-line utilities.
