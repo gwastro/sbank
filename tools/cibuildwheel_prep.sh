@@ -11,7 +11,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     ln -sf `python -c 'import sys; print (sys.path[-1])'`/lalsuite.*libs/liblal-*so* /usr/lib/liblal.so
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac names are quite different
-    conda install -c conda-forge lalsuite
+    sudo conda install -c conda-forge lalsuite
     #sudo echo "export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/" >> /etc/bashrc
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
