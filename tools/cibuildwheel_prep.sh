@@ -14,7 +14,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     mkdir -p ~/lib
     cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib ~/lib
     cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib ~/lib/liblal.dylib
-    cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
-    cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
+    sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
+    sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
 
 fi # Don't consider anything else at present
