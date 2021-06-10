@@ -3,7 +3,7 @@ set -e
 # DO NOT RUN THIS SCRIPT OUTSIDE OF THAT!!!
 pip install lalsuite
 # DEBUG COMMAND BELOW. THIS MUST BE REMOVED
-pip install --upgrade https://github.com/spxiwh/delocate
+pip install --upgrade git+https://github.com/spxiwh/delocate.git
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Needed for linux
