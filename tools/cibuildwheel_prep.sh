@@ -14,7 +14,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sudo conda install -c conda-forge liblal
     conda init
     source ~/.bashrc
-    conda activate root
+    #conda activate root
     echo "conda activate root" >> ~/.bashrc
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
