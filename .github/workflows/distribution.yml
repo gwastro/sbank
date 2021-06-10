@@ -27,8 +27,6 @@ jobs:
           # pip is hard to link against. This symlinks it into /usr/lib so
           # that it can be found.
           CIBW_BEFORE_BUILD: bash tools/cibuildwheel_prep.sh
-          # lalsuite currently not available on python3.9. It should be in the
-          # very near future though, so add cp39-* here when it is!
           CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
           CIBW_ARCHS: auto64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
