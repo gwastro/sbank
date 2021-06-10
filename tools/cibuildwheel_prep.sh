@@ -11,4 +11,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac names are quite different
     sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
     sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
+    # I don't understand why this directory is used at all. The code that does this is here:
+    # https://github.com/matthew-brett/delocate
+    sudo mkdir /DLC
+    sudo chmod ugo+rwx /DLC
 fi # Don't consider anything else at present
