@@ -12,6 +12,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac names are quite different
     sudo conda install -c conda-forge lalsuite
+    conda init
+    source ~/.bashrc
     conda activate root
     echo "conda activate root" >> ~/.bashrc
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
