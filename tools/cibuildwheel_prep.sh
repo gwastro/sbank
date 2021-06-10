@@ -11,7 +11,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     ln -sf `python -c 'import sys; print (sys.path[-1])'`/lalsuite.*libs/liblal-*so* /usr/lib/liblal.so
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac names are quite different
-    sudo conda install -c conda-forge lalsuite
+    sudo conda install -c conda-forge liblal
     conda init
     source ~/.bashrc
     conda activate root
