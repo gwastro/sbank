@@ -19,7 +19,19 @@ jobs:
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==1.9.0
 
-      - name: Build wheels
+      - name: Build wheels for python 3.6, 3.7 and 3.8
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          # This BEFORE_BUILD is a horrible hack. I need to be able to link
+          # against the lal library. However, the lal library installed through
+          # pip is hard to link against. This symlinks it into /usr/lib so
+          # that it can be found.
+          CIBW_BEFORE_BUILD: bash tools/cibuildwheel_prep.sh
+          # lalsuite currently not available on python3.9. It should be in the
+          # very near future though, so add cp39-* here when it is!
+          CIBW_BUILD: cp36-* cp37-* cp38-*
+          CIBW_ARCHS: auto64
+      - name: Build wheels for python3.9
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           # This BEFORE_BUILD is a horrible hack. I need to be able to link
@@ -31,6 +43,8 @@ jobs:
           # very near future though, so add cp39-* here when it is!
           CIBW_BUILD: cp39-*
           CIBW_ARCHS: auto64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux2014
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
