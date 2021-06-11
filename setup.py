@@ -34,11 +34,13 @@ if int(os.getenv("CYTHON_LINETRACE", "0")):
     cython_compile_args.append("-DCYTHON_TRACE")
 
 # define compiled extensions
+lalsuite_lib_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
 exts = [
     Extension(
         "sbank.overlap_cpu",
         ["sbank/overlap_cpu.pyx"],
         include_dirs=[numpy.get_include()],
+        library_dirs=[lalsuite_lib_dir],
         language="c",
         libraries=["lal"],
         extra_compile_args=cython_compile_args,
