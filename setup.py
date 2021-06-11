@@ -34,7 +34,11 @@ if int(os.getenv("CYTHON_LINETRACE", "0")):
     cython_compile_args.append("-DCYTHON_TRACE")
 
 # define compiled extensions
-lalsuite_lib_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
+for curr_path in sys.path[::-1]:
+    curr_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
+    if os.path.isdir(curr_dir):
+        lalsuite_lib_dir = curr_dir
+        break
 exts = [
     Extension(
         "sbank.overlap_cpu",
