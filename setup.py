@@ -4,7 +4,7 @@
 """Build configuration for sbank
 """
 
-import os
+import os, sys
 
 from setuptools import setup, Extension
 
