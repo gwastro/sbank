@@ -36,6 +36,7 @@ if int(os.getenv("CYTHON_LINETRACE", "0")):
 # define compiled extensions
 for curr_path in sys.path[::-1]:
     curr_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
+    print (curr_dir)
     if os.path.isdir(curr_dir):
         lalsuite_lib_dir = curr_dir
         break
