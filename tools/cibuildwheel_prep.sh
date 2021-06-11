@@ -17,7 +17,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     #conda activate root
     #echo "conda activate root" >> ~/.bashrc
     echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
-    ls `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    sudo echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    sudo ls `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
     export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
     echo "export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/" >> ~/.bashrc 
     #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
