@@ -4,7 +4,7 @@
 """Build configuration for sbank
 """
 
-import os, sys
+import os, sys, glob
 
 from setuptools import setup, Extension
 
@@ -41,6 +41,9 @@ for curr_path in sys.path[::-1]:
     if os.path.isdir(curr_dir):
         lalsuite_lib_dir = curr_dir
         break
+
+lal_library = glob.glob(lalsuite_lib_dir + '/liblal.*.dylib')[0]
+        
 exts = [
     Extension(
         "sbank.overlap_cpu",
@@ -49,6 +52,7 @@ exts = [
         library_dirs=[lalsuite_lib_dir],
         language="c",
         libraries=["lal"],
+        extra_objects=[lal_library],
         extra_compile_args=cython_compile_args,
         extra_link_args=[],
     ),
