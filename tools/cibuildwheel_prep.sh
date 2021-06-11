@@ -1,7 +1,7 @@
 set -e
 # This is used in github actions when building the wheels for distribution.
 # DO NOT RUN THIS SCRIPT OUTSIDE OF THAT!!!
-#pip install lalsuite
+pip install lalsuite
 # DEBUG COMMAND BELOW. THIS MUST BE REMOVED
 pip install --upgrade git+https://github.com/spxiwh/delocate.git
 
