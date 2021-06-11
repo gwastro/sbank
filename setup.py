@@ -34,6 +34,7 @@ if int(os.getenv("CYTHON_LINETRACE", "0")):
     cython_compile_args.append("-DCYTHON_TRACE")
 
 # define compiled extensions
+lalsuite_lib_dir = '/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/lalsuite.dylibs/'
 for curr_path in sys.path[::-1]:
     curr_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
     print (curr_dir)
