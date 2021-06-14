@@ -4,7 +4,7 @@
 """Build configuration for sbank
 """
 
-import os, sys, glob
+import os
 
 from setuptools import setup, Extension
 
@@ -34,25 +34,13 @@ if int(os.getenv("CYTHON_LINETRACE", "0")):
     cython_compile_args.append("-DCYTHON_TRACE")
 
 # define compiled extensions
-lalsuite_lib_dir = '/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/lalsuite.dylibs/'
-for curr_path in sys.path[::-1]:
-    curr_dir = os.path.join(sys.path[-1], 'lalsuite.dylibs')
-    print (curr_dir)
-    if os.path.isdir(curr_dir):
-        lalsuite_lib_dir = curr_dir
-        break
-
-lal_library = glob.glob(lalsuite_lib_dir + '/liblal.*.dylib')[0]
-        
 exts = [
     Extension(
         "sbank.overlap_cpu",
         ["sbank/overlap_cpu.pyx"],
         include_dirs=[numpy.get_include()],
-        library_dirs=[lalsuite_lib_dir],
         language="c",
-        libraries=[],
-        extra_objects=[lal_library],
+        libraries=['lal'],
         extra_compile_args=cython_compile_args,
         extra_link_args=[],
     ),
