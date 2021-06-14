@@ -16,12 +16,12 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     #source ~/.bashrc
     #conda activate root
     #echo "conda activate root" >> ~/.bashrc
-    echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
-    sudo echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
-    sudo ls `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
-    export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
-    echo "export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/" >> ~/.bashrc 
-    #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
-    #sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
+    #echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    #sudo echo `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    #sudo ls `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    #export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/
+    #echo "export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:`python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/" >> ~/.bashrc 
+    sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/lib*dylib /usr/local/lib
+    sudo cp `python -c 'import sys; print (sys.path[-1])'`/lalsuite.dylibs/liblal.*.dylib /usr/local/lib/liblal.dylib
 
 fi # Don't consider anything else at present
