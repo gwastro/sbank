@@ -39,8 +39,7 @@ from lalapps import inspiral
 def which(prog):
     out = shutil.which(prog)
     if out is None:
-        print("ERROR: could not find %s in your path, have you built the proper software and source the proper env. scripts?" % (prog,prog), file=sys.stderr)
-        raise ValueError
+        raise ValueError("Could not find {} in your path, have you built the proper software and sourced the proper env. scripts?".format(prog))
     return out
 
 
