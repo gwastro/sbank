@@ -42,7 +42,7 @@ def which(prog):
     if not out:
         print("ERROR: could not find %s in your path, have you built the proper software and source the proper env. scripts?" % (prog,prog), file=sys.stderr)
         raise ValueError
-    return out
+    return out.decode()
 
 def log_path():
     host = socket.getfqdn()
