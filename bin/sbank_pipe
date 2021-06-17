@@ -24,9 +24,9 @@ from __future__ import print_function
 import getpass
 import os
 import socket
-import subprocess
 import sys
 import tempfile
+import shutil
 
 ##############################################################################
 # import the modules we need to build the pipeline
@@ -37,12 +37,11 @@ from glue import pipeline
 from lalapps import inspiral
 
 def which(prog):
-    which = subprocess.Popen(['/usr/bin/which', prog], stdout=subprocess.PIPE)
-    out = which.stdout.read().strip()
-    if not out:
-        print("ERROR: could not find %s in your path, have you built the proper software and source the proper env. scripts?" % (prog,prog), file=sys.stderr)
-        raise ValueError
+    out = shutil.which(prog)
+    if out is None:
+        raise ValueError("Could not find {} in your path, have you built the proper software and sourced the proper env. scripts?".format(prog))
     return out
+
 
 def log_path():
     host = socket.getfqdn()
