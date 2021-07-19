@@ -22,3 +22,7 @@ export PYBUILD_AFTER_INSTALL = \
 	dh $@ \
 	    --with python3 \
 	    --buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f sbank/overlap_cpu.c || true
