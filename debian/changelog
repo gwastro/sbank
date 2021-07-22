@@ -1,3 +1,10 @@
+sbank (0.0.3-1.1) unstable; urgency=low
+
+  * remove file written by Cython in "clean" stage
+  * allow ligo-lw-bin to jump in for python3-ligo-lw-bin
+
+ -- Steffen Grunewald <steffen.grunewald@ligo.org>  Wed, 07 Jul 2021 13:05:00 +0200
+
 sbank (0.0.3-1) unstable; urgency=low
 
   * first debian build
