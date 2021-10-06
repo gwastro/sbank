@@ -214,7 +214,7 @@ jobs:
           ;
 
       - name: Lintian
-        run: lintian --color=auto --fail-on-warnings --allow-root --pedantic --suppress-tags manpage-has-useless-whatis-entry,manpage-has-errors-from-man *.changes
+        run: lintian --color=auto --fail-on warning --allow-root --pedantic --suppress-tags manpage-has-useless-whatis-entry,manpage-has-errors-from-man *.changes
 
   # -- RHEL -----------------
 
