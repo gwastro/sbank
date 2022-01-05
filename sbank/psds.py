@@ -23,7 +23,7 @@ import lalsimulation as lalsim
 import lal
 from lal import series as lalseries
 
-from glue.ligolw import (param, utils)
+from ligo.lw import (param, utils)
 
 seterr(over="ignore")  # the PSD overflows frequently, but that's OK
 

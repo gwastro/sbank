@@ -34,12 +34,12 @@ from optparse import OptionParser
 
 import numpy
 
-from glue.ligolw import (ligolw, lsctables, utils)
+from ligo.lw import (ligolw, lsctables, utils)
 
 
+@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
-lsctables.use_in(ContentHandler)
 
 def parse_command_line():
     parser = OptionParser(usage=__doc__)

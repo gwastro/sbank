@@ -27,8 +27,8 @@ import numpy as np
 from h5py import File as H5File
 
 from scipy.interpolate import UnivariateSpline
-from glue.ligolw import (ligolw, lsctables, utils)
-from glue.ligolw.utils import (ligolw_add, process as ligolw_process)
+from ligo.lw import (ligolw, lsctables, utils)
+from ligo.lw.utils import (ligolw_add, process as ligolw_process)
 
 import lalsimulation as lalsim
 from lal import MSUN_SI
@@ -37,13 +37,13 @@ from sbank.bank import Bank
 from sbank.waveforms import waveforms
 from sbank.psds import noise_models, read_psd
 
+@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
-lsctables.use_in(ContentHandler)
 
 def ligolw_table_to_array(tab):
     # get mapping of LIGO_LW types to numpy numeric types; add string types
-    from glue.ligolw.types import ToNumPyType
+    from ligo.lw.types import ToNumPyType
     type_map = ToNumPyType.copy()
     type_map[u"ilwd:char"] = "S40"
     type_map[u"lstring"] = "S32"

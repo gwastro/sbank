@@ -26,19 +26,19 @@ import lal
 import lalsimulation as lalsim
 from lal import MSUN_SI, MTSUN_SI, PC_SI, PI
 from lal import CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
-from glue.ligolw.lsctables import SnglInspiralTable as gluesit
+from ligo.lw.lsctables import SnglInspiralTable as llwsit
 
 from .overlap import SBankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD
 from .tau0tau3 import m1m2_to_tau0tau3
 
 np.seterr(all="ignore")
-_sit_cols = gluesit.validcolumns
+_sit_cols = llwsit.validcolumns
 
 
-class SnglInspiralTable(gluesit):
+class SnglInspiralTable(llwsit):
     def __init__(self, *args, **kwargs):
-        gluesit.__init__(self, *args, **kwargs)
+        llwsit.__init__(self, *args, **kwargs)
         for entry in _sit_cols.keys():
             if not(hasattr(self, entry)):
                 if _sit_cols[entry] in ['real_4', 'real_8']:

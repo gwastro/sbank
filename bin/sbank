@@ -32,11 +32,11 @@ import h5py
 
 from scipy.interpolate import UnivariateSpline
 
-from glue.ligolw import ligolw
-from glue.ligolw import lsctables
-from glue.ligolw import utils
-from glue.ligolw import ilwd
-from glue.ligolw.utils import process as ligolw_process
+from ligo.lw import ligolw
+from ligo.lw import lsctables
+from ligo.lw import utils
+from ligo.lw import ilwd
+from ligo.lw.utils import process as ligolw_process
 
 #from sbank import git_version FIXME
 from sbank.bank import Bank
@@ -45,9 +45,9 @@ from sbank.psds import (noise_models, read_psd)
 from sbank.waveforms import waveforms, SnglInspiralTable
 
 
+@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
-lsctables.use_in(ContentHandler)
 
 usage = """
 
@@ -461,7 +461,7 @@ opts_dict = dict((k, v) for k, v in opts.__dict__.items()
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
     process = ligolw_process.register_to_xmldoc(xmldoc, "sbank",
         opts_dict, version="no version",
-        cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
+        cvs_repository="sbank", cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +000'))
 
 
 #
