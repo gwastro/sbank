@@ -45,7 +45,9 @@ BuildRequires: python%{python3_pkgversion}-scipy
 BuildRequires: python%{python3_pkgversion}-six
 
 # testing dependencies (required for %check)
-BuildRequires: python%{python3_pkgversion}-pytest
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
+BuildRequires: python%{python3_pkgversion}-pytest >= 3.9.1
+%endif
 
 # -- src rpm ----------------
 
@@ -113,7 +115,9 @@ mkdir -p _tests
 cd _tests
 export PATH="%{buildroot}%{_bindir}:${PATH}"
 export PYTHONPATH="%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}:${PYTHONPATH}"
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 9
 %{__python3} -m pytest --color=yes --pyargs %{srcname}
+%endif
 sbank --help
 
 %install

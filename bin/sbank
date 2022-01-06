@@ -32,11 +32,10 @@ import h5py
 
 from scipy.interpolate import UnivariateSpline
 
-from glue.ligolw import ligolw
-from glue.ligolw import lsctables
-from glue.ligolw import utils
-from glue.ligolw import ilwd
-from glue.ligolw.utils import process as ligolw_process
+from ligo.lw import ligolw
+from ligo.lw import lsctables
+from ligo.lw import utils
+from ligo.lw.utils import process as ligolw_process
 
 #from sbank import git_version FIXME
 from sbank.bank import Bank
@@ -45,9 +44,9 @@ from sbank.psds import (noise_models, read_psd)
 from sbank.waveforms import waveforms, SnglInspiralTable
 
 
+@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
-lsctables.use_in(ContentHandler)
 
 usage = """
 
@@ -140,7 +139,7 @@ def checkpoint_save(xmldoc, fout, process):
 
     # write out the document
     ligolw_process.set_process_end_time(process)
-    utils.write_filename(xmldoc, fout + "_checkpoint.gz",  gz=True)
+    utils.write_filename(xmldoc, fout + "_checkpoint.gz")
 
 
 def parse_command_line():
@@ -461,7 +460,7 @@ opts_dict = dict((k, v) for k, v in opts.__dict__.items()
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
     process = ligolw_process.register_to_xmldoc(xmldoc, "sbank",
         opts_dict, version="no version",
-        cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
+        cvs_repository="sbank", cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +000'))
 
 
 #
@@ -470,7 +469,7 @@ if opts.output_filename.endswith(('.xml', '.xml.gz')):
 
 if opts.trial_waveforms:
     if opts.trial_waveforms.endswith(('.xml', '.xml.gz')):
-        trialdoc = utils.load_filename(opts.trial_waveforms, contenthandler=ContentHandler, gz=opts.trial_waveforms.endswith('.gz'))
+        trialdoc = utils.load_filename(opts.trial_waveforms, contenthandler=ContentHandler)
         trial_sngls = lsctables.SnglInspiralTable.get_table(trialdoc)
         proposal = (tmplt_class.from_sngl(t, bank=bank) for t in trial_sngls)
     elif opts.trial_waveforms.endswith(('.hdf', '.h5', '.hdf5')):
@@ -556,10 +555,6 @@ for tmplt in proposal:
         if not hasattr(tmplt, 'is_seed_point'):
             if opts.output_filename.endswith(('.xml', '.xml.gz')):
                 row = tmplt.to_sngl()
-                # Event ids must be unique, or the table isn't valid,
-                # SQL needs this
-                row.event_id = ilwd.ilwdchar('sngl_inspiral:event_id:%d' %
-                                             (len(bank), ))
                 # If we figure out how to use metaio's SnglInspiralTable the
                 # following change then defines the event_id
                 #curr_id = EventIDColumn()
@@ -568,6 +563,7 @@ for tmplt in proposal:
                 #row.event_id = curr_id
                 row.ifo = opts.instrument
                 row.process_id = process.process_id
+                row.event_id = tbl.get_next_id()
                 tbl.append(row)
             if opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
                 row = tmplt.to_storage_arr()
@@ -594,8 +590,7 @@ bank.clear()  # clear caches
 # write out the document
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
     ligolw_process.set_process_end_time(process)
-    utils.write_filename(xmldoc, opts.output_filename,
-                         gz=opts.output_filename.endswith("gz"))
+    utils.write_filename(xmldoc, opts.output_filename)
 elif opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
     hdf_fp = h5py.File(opts.output_filename, 'w')
     if len(tbl) == 0:

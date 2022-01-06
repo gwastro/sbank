@@ -23,7 +23,7 @@ Build-Depends:
  python3-ligo-lw-bin | ligo-lw-bin,
  python3-matplotlib,
  python3-numpy,
- python3-pytest,
+ python3-pytest (>= 3.9.1),
  python3-scipy,
  python3-six,
  python3-setuptools (>= 30.3.0),
