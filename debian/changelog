@@ -1,3 +1,9 @@
+sbank (1.0.0-1) stable; urgency=low
+
+  * Move sbank from glue.ligolw to ligo.lw
+
+ -- Ian Harry <ian.harry@ligo.org>  Thu, 18 Jan 2022 16:24:00 +0000
+
 sbank (0.0.3-1.1) unstable; urgency=low
 
   * remove file written by Cython in "clean" stage
