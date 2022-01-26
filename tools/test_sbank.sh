@@ -1,3 +1,4 @@
+set -e
 # Run sbank to generate XML and HDF banks
 ./sbank --approximant IMRPhenomD --aligned-spin --mass1-min 15.0 --mass1-max 25.0 --spin1-min 0.0 --spin1-max 0.5 --match-min 0.97 --flow 20.0 --noise-model aLIGOZeroDetHighPower --output-filename BBH-IMRPhenomD-aLIGOZeroDetHighPower.xml --convergence-threshold 45
 
