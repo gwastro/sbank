@@ -8,11 +8,11 @@ XML_SIZE=`ligolw_print BBH-IMRPhenomD-aLIGOZeroDetHighPower.xml -t sngl_inspiral
 HDF_SIZE=`h5ls BBH-IMRPhenomD-aLIGOZeroDetHighPower.hdf | grep "spin1z" | awk '{print $3}'`
 HDF_SIZE="${HDF_SIZE:1:3}"
 
-if ((XML_SIZE >= 140 && XML_SIZE <= 160)); then
+if ((XML_SIZE < 140 || XML_SIZE > 160)); then
   exit 1
 fi
 
-if ((HDF_SIZE >= 240 && HDF_SIZE <= 260)); then
+if ((HDF_SIZE < 240 || HDF_SIZE > 260)); then
   exit 1
 fi
 
