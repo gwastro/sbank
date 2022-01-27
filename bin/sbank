@@ -599,7 +599,7 @@ elif opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
     else:
         params = tbl.dtype.names
         # This would be less clunky if I could use a modern HDF version!!!
-        params_b = [bytes(p, 'utf-8') for p in params]
+        params_b = [p.encode('utf-8') for p in params]
         hdf_fp.attrs['parameters'] = params_b
         for param in params:
             hdf_fp[param] = tbl[param]
