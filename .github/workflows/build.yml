@@ -107,6 +107,9 @@ jobs:
                 ${script} --help
         done
 
+    - name: Run short sbank executable tests
+      run: bash tools/test_sbank.sh
+
     - name: Coverage report
       run: python -m coverage report --show-missing
 

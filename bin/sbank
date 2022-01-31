@@ -138,7 +138,7 @@ def checkpoint_save(xmldoc, fout, process):
              state4=np.array(rng_state[4]))
 
     # write out the document
-    ligolw_process.set_process_end_time(process)
+    process.set_end_time_now()
     utils.write_filename(xmldoc, fout + "_checkpoint.gz")
 
 
@@ -460,7 +460,8 @@ opts_dict = dict((k, v) for k, v in opts.__dict__.items()
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
     process = ligolw_process.register_to_xmldoc(xmldoc, "sbank",
         opts_dict, version="no version",
-        cvs_repository="sbank", cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +000'))
+        cvs_repository="sbank",
+        cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +0000'))
 
 
 #
@@ -589,7 +590,7 @@ bank.clear()  # clear caches
 
 # write out the document
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
-    ligolw_process.set_process_end_time(process)
+    process.set_end_time_now()
     utils.write_filename(xmldoc, opts.output_filename)
 elif opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
     hdf_fp = h5py.File(opts.output_filename, 'w')
@@ -597,6 +598,8 @@ elif opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
         hdf_fp.attrs['empty_file'] = True
     else:
         params = tbl.dtype.names
-        hdf_fp.attrs['parameters'] = params
+        # This would be less clunky if I could use a modern HDF version!!!
+        params_b = [p.encode('utf-8') for p in params]
+        hdf_fp.attrs['parameters'] = params_b
         for param in params:
             hdf_fp[param] = tbl[param]
