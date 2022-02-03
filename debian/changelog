@@ -1,3 +1,9 @@
+sbank (1.0.1-1) stable; urgency=low
+
+  * Resolve some issues with ligo.lw usage in sbank
+
+ -- Ian Harry <ian.harry@ligo.org>  Thu, 03 Feb 2022 16:06:00 +0000
+
 sbank (1.0.0-1) stable; urgency=low
 
   * Move sbank from glue.ligolw to ligo.lw
