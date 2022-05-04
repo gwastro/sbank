@@ -99,6 +99,7 @@ class SBankJob(inspiral.InspiralAnalysisJob):
                 self.add_condor_cmd('accounting_group_user', cp.get("accounting", "accounting-group-user"))
         self.add_condor_cmd('getenv','True')
         self.add_condor_cmd('request_memory', '3999')
+        self.add_condor_cmd('request_disk', '1MB')
         if "OMP_NUM_THREADS" in os.environ:
             self.add_condor_cmd('request_cpus', os.environ["OMP_NUM_THREADS"])
 
@@ -135,6 +136,8 @@ class SBankChooseMchirpBoundariesJob(inspiral.InspiralAnalysisJob):
         self.tag_base = tag_base
         self.set_stdout_file('logs/'+tag_base+'-$(macroid)-$(process).out')
         self.set_stderr_file('logs/'+tag_base+'-$(macroid)-$(process).err')
+        self.add_condor_cmd('request_memory', '1000')
+        self.add_condor_cmd('request_disk', '1MB')
         if cp.has_section("accounting"):
             self.add_condor_cmd('accounting_group', cp.get("accounting", "accounting-group"))
             if cp.has_option("accounting", "accounting-group-user"):
@@ -172,6 +175,7 @@ class LWAddJob(pipeline.CondorDAGJob):
         self.__universe = 'vanilla'
         pipeline.CondorDAGJob.__init__(self,self.__universe,self.__executable)
         self.add_condor_cmd('request_memory', '3999')
+        self.add_condor_cmd('request_disk', '1MB')
         self.add_condor_cmd('getenv','True')
         if cp.has_section("accounting"):
             self.add_condor_cmd('accounting_group', cp.get("accounting", "accounting-group"))
