@@ -85,6 +85,8 @@ class InspinjJob(inspiral.InspiralAnalysisJob):
         self.set_universe("local")
         self.set_sub_file(tag_base+'.sub')
         self.tag_base = tag_base
+        self.add_condor_cmd('request_memory', '1999')
+        self.add_condor_cmd('request_disk', '1MB')
         self.set_stdout_file('logs/'+tag_base+'-$(macroid)-$(process).out')
         self.set_stderr_file('logs/'+tag_base+'-$(macroid)-$(process).err')
         if cp.has_section("accounting"):
@@ -115,6 +117,8 @@ class BankSimJob(inspiral.InspiralAnalysisJob):
         self.add_condor_cmd('request_memory', '3999')
         self.tag_base = tag_base
         self.add_condor_cmd('getenv','True')
+        self.add_condor_cmd('request_memory', '3999')
+        self.add_condor_cmd('request_disk', '1MB')
         self.set_stdout_file('logs/'+tag_base+'$(macroid)-$(cluster)-$(process).out')
         self.set_stderr_file('logs/'+tag_base+'-$(macroid)-$(cluster)-$(process).err')
         if cp.has_section("accounting"):
@@ -145,6 +149,8 @@ class PlotSimJob(inspiral.InspiralAnalysisJob):
         sections = []
         inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension)
         self.tag_base = tag_base
+        self.add_condor_cmd('request_memory', '3999')
+        self.add_condor_cmd('request_disk', '1MB')
         self.set_universe("local")
         self.set_sub_file(tag_base+'.sub')
         self.set_stdout_file('logs/'+tag_base+'-$(macroid)-$(process).out')
