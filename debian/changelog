@@ -1,3 +1,9 @@
+sbank (1.0.2-1) stable; urgency=low
+
+  * Ensure request_disk gets set
+
+ -- Ian Harry <ian.harry@ligo.org>  Thu, 05 May 2022 16:06:00 +0000
+
 sbank (1.0.1-1) stable; urgency=low
 
   * Resolve some issues with ligo.lw usage in sbank
