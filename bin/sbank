@@ -376,7 +376,10 @@ else:
 #
 # initialize the bank
 #
-bank = Bank(noise_model, opts.flow, opts.use_metric, opts.cache_waveforms, opts.neighborhood_size, opts.neighborhood_param, coarse_match_df=opts.coarse_match_df, iterative_match_df_max=opts.iterative_match_df_max, fhigh_max=opts.fhigh_max, optimize_flow=opts.optimize_flow, flow_column=opts.flow_column)
+bank = Bank(noise_model, opts.flow, opts.use_metric, opts.cache_waveforms, opts.neighborhood_size,
+            opts.neighborhood_param, coarse_match_df=opts.coarse_match_df,
+            iterative_match_df_max=opts.iterative_match_df_max, fhigh_max=opts.fhigh_max,
+            optimize_flow=opts.optimize_flow)
 for file_approx in opts.bank_seed:
 
     # if no approximant specified, use same approximant as the
@@ -565,6 +568,8 @@ for tmplt in proposal:
                 row.ifo = opts.instrument
                 row.process_id = process.process_id
                 row.event_id = tbl.get_next_id()
+                if opts.flow_column:
+                    setattr(row, opts.flow_column, tmplt.flow)
                 tbl.append(row)
             if opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
                 row = tmplt.to_storage_arr()

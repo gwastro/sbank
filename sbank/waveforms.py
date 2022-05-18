@@ -181,7 +181,7 @@ class AlignedSpinTemplate(object):
       a sim_inspiral object.
     """
     approximant = None
-    __slots__ = ("m1", "m2", "spin1z", "spin2z", "chieff", "bank", "tau0",
+    __slots__ = ("m1", "m2", "spin1z", "spin2z", "chieff", "tau0", "tau0_40", "flow",
                  "_dur", "_mchirp", "_wf", "_metric", "sigmasq",
                  "is_seed_point", "_f_final", "_fhigh_max")
     param_names = ("m1", "m2", "spin1z", "spin2z")
@@ -199,7 +199,6 @@ class AlignedSpinTemplate(object):
         self.spin2z = float(spin2z)
         self.chieff = lalsim.SimIMRPhenomBComputeChi(self.m1, self.m2,
                                                      self.spin1z, self.spin2z)
-        self.bank = bank
 
         if flow is None:
             self.flow = bank.flow
@@ -324,7 +323,6 @@ class AlignedSpinTemplate(object):
     def to_sngl(self):
         # All numerical values are initiated as 0 and all strings as ''
         row = SnglInspiralTable()
-
         row.mass1 = self.m1
         row.mass2 = self.m2
         row.mtotal = self.m1 + self.m2
@@ -335,8 +333,6 @@ class AlignedSpinTemplate(object):
         row.spin1z = self.spin1z
         row.spin2z = self.spin2z
         row.sigmasq = self.sigmasq
-        if self.bank.flow_column:
-            setattr(row, self.bank.flow_column, self.flow)
 
         return row
 
@@ -546,7 +542,7 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
     param_formats = ("%.5f", "%.5f", "%+.4f")
 
     __slots__ = ("chired", "tau0", "_dur", "_mchirp", "_eta", "_theta0",
-                 "_theta3", "_theta3s")
+                 "_theta3", "_theta3s", "bank")
 
     def __init__(self, m1, m2, spin1z, spin2z, bank, flow=None, duration=None):
 
@@ -574,6 +570,7 @@ class TaylorF2RedSpinTemplate(InspiralAlignedSpinTemplate):
             self.chired,
             self.flow
         )
+        self.bank = bank
 
     def finalize_as_template(self):
         if not self.bank.use_metric:
@@ -824,28 +821,16 @@ class PrecessingSpinTemplate(AlignedSpinTemplate):
 
     def to_sngl(self):
         # All numerical values are initiated as 0 and all strings as ''
-        row = SnglInspiralTable()
-        row.mass1 = self.m1
-        row.mass2 = self.m2
-        row.mtotal = self.m1 + self.m2
-        row.mchirp = self._mchirp
-        row.eta = row.mass1 * row.mass2 / (row.mtotal * row.mtotal)
-        row.tau0, row.tau3 = m1m2_to_tau0tau3(self.m1, self.m2, self.flow)
-        row.template_duration = self.dur
+        row = super(PrecessingSpinTemplate, self).to_sngl()
         row.spin1x = self.spin1x
         row.spin1y = self.spin1y
-        row.spin1z = self.spin1z
         row.spin2x = self.spin2x
         row.spin2y = self.spin2y
-        row.spin2z = self.spin2z
         row.alpha1 = self.theta
         row.alpha2 = self.phi
         row.alpha3 = self.iota
         row.alpha4 = self.psi
         row.alpha5 = self.orb_phase
-        row.sigmasq = self.sigmasq
-        if self.bank.flow_column:
-            setattr(row, self.bank.flow_column, self.flow)
         return row
 
     def to_storage_arr(self):
@@ -926,32 +911,6 @@ class SpinTaylorF2Template(InspiralPrecessingSpinTemplate):
     @classmethod
     def from_dict(cls, hdf_fp, idx, bank):
         raise NotImplementedError('Please write this!')
-
-    def to_sngl(self):
-        # All numerical values are initiated as 0 and all strings as ''
-        row = SnglInspiralTable()
-        row.mass1 = self.m1
-        row.mass2 = self.m2
-        row.mtotal = self.m1 + self.m2
-        row.mchirp = self._mchirp
-        row.eta = row.mass1 * row.mass2 / (row.mtotal * row.mtotal)
-        row.tau0, row.tau3 = m1m2_to_tau0tau3(self.m1, self.m2, self.flow)
-        row.template_duration = self.dur
-        row.spin1x = self.spin1x
-        row.spin1y = self.spin1y
-        row.spin1z = self.spin1z
-        row.spin2x = 0
-        row.spin2y = 0
-        row.spin2z = 0
-        row.alpha1 = self.theta
-        row.alpha2 = self.phi
-        row.alpha3 = self.iota
-        row.alpha4 = self.psi
-        row.alpha5 = self.orb_phase
-        row.sigmasq = self.sigmasq
-        if self.bank.flow_column:
-            setattr(row, self.bank.flow_column, self.flow)
-        return row
 
 
 class SpinTaylorT5FourierTemplate(InspiralPrecessingSpinTemplate):
