@@ -652,7 +652,7 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
     hdf_dtype = AlignedSpinTemplate.hdf_dtype + \
             [('eccentricity', float), ('mean_per_ano', float)]
 
-    def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref, bank, flow=None, duration=None):
+    def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref=None, bank=None, flow=None, duration=None):
         AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
                                      flow=flow, duration=duration)
         self.eccentricity = float(eccentricity)
@@ -666,6 +666,26 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
         self.tau0 = compute_tau0(self._mchirp, bank.flow)
         self._dur = duration
         self._f_final = None
+
+    @classmethod
+    def from_dict(cls, params, idx, bank):
+        flow = float(params['f_lower'][idx])
+        if not flow > 0:
+            flow = None
+        duration = float(params['template_duration'][idx])
+        if not duration > 0:
+            duration = None
+        return cls(float(params['mass1'][idx]), float(params['mass2'][idx]),
+                   float(params['spin1z'][idx]), float(params['spin2z'][idx]),
+                   float(params['eccentricity'][idx]), float(params['mean_per_ano'][idx]),
+                   bank, flow=flow, duration=duration)
+
+    def to_storage_arr(self):
+        """Dump the template params to a numpy array."""
+        new_tmplt = super(EccentricAlignedSpinTemplate, self).to_storage_arr()
+        new_tmplt['eccentricity'] = self.eccentricity
+        new_tmplt['mean_per_ano'] = self.mean_per_ano
+        new_tmplt['f_ref'] = self.f_ref
 
 
 class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
