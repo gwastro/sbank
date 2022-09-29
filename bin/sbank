@@ -18,7 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from __future__ import (division, print_function)
+# from __future__ import (division, print_function)
 
 import os
 import sys
@@ -40,7 +40,7 @@ from ligo.lw.utils import process as ligolw_process
 #from sbank import git_version FIXME
 from sbank.bank import Bank
 from sbank.tau0tau3 import proposals
-from sbank.psds import (noise_models, read_psd)
+from sbank.psds import noise_models, read_psd
 from sbank.waveforms import waveforms, SnglInspiralTable
 
 
@@ -60,6 +60,17 @@ Supported template approximants:
 \t%s
 
 Example command lines:
+
+** Generate eccentric template bank with aligned spins using ecc IMR waveform.
+
+sbank --approximant IMRPhenomXE --aligned-spin \\
+        --mass1-min 15.0 --mass1-max 25.0 \\
+        --spin1-min 0.0 --spin1-max 0.5 \\
+        --mass2-min 10.0 --mass2-max 15.0 \\
+        --spin2-min 0.0 --spin2-max 0.5 \\
+        --ecc-mean 0.0 --ecc-max 0.2 --f-ref 10.0 \\
+        --match-min 0.97 --flow 20.0 --noise-model aLIGOZeroDetHighPower \\
+        --output-filename BBH-IMRPhenomXE-aLIGOZeroDetHighPower.xml.gz --verbose
 
 ** Generate a template bank of positively aligned-spin
 inspiral-merger-ringdown binary black hole waveforms for use in an
@@ -142,6 +153,12 @@ def checkpoint_save(xmldoc, fout, process):
     utils.write_filename(xmldoc, fout + "_checkpoint.gz")
 
 
+aligned_spin_approx = ["TaylorF2RedSpin",
+        "IMRPhenomB","IMRPhenomC", "IMRPhenomD", "IMRPhenomXE", "IMRPhenomXEv1",
+        "SEOBNRv1", "SEOBNRv2", "SEOBNRv2_ROM_DoubleSpin", "SEOBNRv2_ROM_DoubleSpin_HI"]
+
+ecc_aligned_spin_approxs = ["IMRPhenomXE", "IMRPhenomXEv1"]
+
 def parse_command_line():
 
     parser = OptionParser(usage = usage)
@@ -180,6 +197,15 @@ def parse_command_line():
     parser.add_option("--ns-spin-min", type=float, metavar="SPIN", help="Minimum spin for neutron stars when using --ns-bh-boundary-mass.")
     parser.add_option("--ns-spin-max", type=float, metavar="SPIN", help="Maximum spin for neutron stars when using --ns-bh-boundary-mass.")
 
+    #
+    # eccentricic params
+    #
+    parser.add_option("--use-eccentric", action="store_true", default=False, help="flag to make sure eccentric parameters are used")
+    parser.add_option("--ecc-min", dest="ecc_min", help="Set minimum allowed ecc", metavar="ECC", type="float", default=0.0)
+    parser.add_option("--ecc-max", dest="ecc_max", help="Set maximum allowed ecc", metavar="ECC", type="float", default=0.3)
+    parser.add_option("--mean-per-ano-min", dest="mean_per_ano_min", help="Set minimum for mean anomaly (mean_per_ano) range", metavar="ECC", type="float", default=0.0)
+    parser.add_option("--mean-per-ano-max", dest="mean_per_ano_max", help="Set maximum for mean anomaly (mean_per_ano) range", metavar="ECC", type="float", default=6.28)
+    parser.add_option("--f-ref", dest="f_ref", help="Set maximum for mean anomaly (mean_per_ano) range", metavar="ECC", type="float", default=10.)
     #
     # initial condition options
     #
@@ -280,8 +306,12 @@ def parse_command_line():
         if opts.spin2_max is None:
             opts.spin2_max = opts.spin1_max
 
-    if opts.approximant in ["TaylorF2RedSpin", "IMRPhenomB","IMRPhenomC", "IMRPhenomD", "SEOBNRv1", "SEOBNRv2", "SEOBNRv2_ROM_DoubleSpin", "SEOBNRv2_ROM_DoubleSpin_HI"] and not opts.aligned_spin:
+
+    if opts.approximant in aligned_spin_approxs and not opts.aligned_spin:
         parser.error("--aligned-spin is required for the %s approximant" % opts.approximant)
+
+    if opts.approximant in ecc_aligned_spin_approxs and not opts.use_eccentric:
+        parser.error("--use-eccentric is required for the %s approximant" % opts.approximant)
 
     if opts.approximant in ["IMRPhenomPv2", "SEOBNRv3"] and opts.aligned_spin:
         opts.approximant = {"IMRPhenomPv2":"IMRPhenomD",
@@ -511,6 +541,10 @@ else:
         params['spin2'] = (opts.spin2_min, opts.spin2_max)
     if opts.duration_min is not None or opts.duration_max is not None:
         params['duration'] = (opts.duration_min, opts.duration_max)
+
+    if opts.use_eccentric:
+        params['eccentricity'] = (opts.ecc_min, opts.ecc_max)
+        params['mean_per_ano'] = (opts.mean_per_ano_min, opts.mean_per_ano_max)
 
     # get the correct generator for the chosen approximant
     proposal = proposals[opts.approximant](opts.flow, tmplt_class, bank,
