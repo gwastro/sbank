@@ -1040,6 +1040,8 @@ waveforms = {
     "TaylorF2": TaylorF2Template,
     "IMRPhenomB": IMRPhenomBTemplate,
     "IMRPhenomC": IMRPhenomCTemplate,
+    "IMRPhenomXE": IMRPhenomXETemplate,
+    "IMRPhenomXEv1": IMRPhenomXETemplate,
     "IMRPhenomD": IMRPhenomDTemplate,
     "IMRPhenomP": IMRPhenomPTemplate,
     "IMRPhenomPv2": IMRPhenomPv2Template,
