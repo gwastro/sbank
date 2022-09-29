@@ -540,7 +540,7 @@ def IMRPhenomXE_param_generator(flow, tmplt_class, bank, **kwargs):
     s1min, s1max = kwargs.pop('spin1', (-0.99, 0.99))
     s2min, s2max = kwargs.pop('spin2', (-0.99, 0.99))
     ecc_min, ecc_max = kwargs.pop('eccentricity', (0.0, 0.3))
-    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (mean_per_ano_min, mean_per_ano_max))
+    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (0., 6.28))
     f_ref = kwargs.get('f_ref', 10.)
 
     s1min, s1max = (max(-0.99, s1min), min(0.99, s1max))
