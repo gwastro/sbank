@@ -31,6 +31,7 @@ from ligo.lw.lsctables import SnglInspiralTable as llwsit
 from .overlap import SBankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD
 from .tau0tau3 import m1m2_to_tau0tau3
+from .phenomxe_utils import get_XE_chirptime
 
 np.seterr(all="ignore")
 _sit_cols = llwsit.validcolumns
@@ -634,6 +635,56 @@ class TaylorF2Template(InspiralAlignedSpinTemplate):
         hplus_fd.data.data[f_max_idx:] = 0
 
         return hplus_fd
+
+
+class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
+    """
+    """
+    param_names = ("m1", "m2", "spin1z", "spin2z", "eccentricity", "mean_per_ano", "f_ref")
+    param_formats = ("%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f")
+    hdf_dtype = AlignedSpinTemplate.hdf_dtype + \
+            [('eccentricity', float), ('mean_per_ano', float)]
+
+    def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref, bank, flow=None, duration=None):
+        AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
+                                     flow=flow, duration=duration)
+        self.eccentricity = float(eccentricity)
+        self.mean_per_ano = float(mean_per_ano)
+        self.f_ref = float(f_ref) if f_ref else 10.
+        self._wf = {}
+        self._metric = None
+        self.sigmasq = 0.
+        self._mchirp = compute_mchirp(m1, m2)
+        self.tau0_40 = compute_tau0_40(self._mchirp)
+        self.tau0 = compute_tau0(self._mchirp, bank.flow)
+        self._dur = duration
+        self._f_final = None
+
+
+class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
+    approx_name = "IMRPhenomXEv1"
+
+    def _compute_waveform(self, df, f_final):
+        phi0 = 0  # This is a reference phase, and not an intrinsic parameter
+        LALpars = lal.CreateDict()
+        approx = lalsim.GetApproximantFromString(self.approx_name)
+        hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
+            self.m1*MSUN_SI, self.m2*MSUN_SI,
+            0., 0., self.spin1z,
+            0., 0., self.spin2z,
+            1.e6*PC_SI, 0., phi0,
+            0., self.eccentricity, self.mean_per_ano,
+            df, self.flow, f_final, self.f_ref,
+            LALpars, approx)
+
+        return hplus_fd
+
+    def _get_chirp_dur(self):
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, f_final)
+
+    def _get_dur(self):
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, f_final)
+
 
 
 class PrecessingSpinTemplate(AlignedSpinTemplate):
