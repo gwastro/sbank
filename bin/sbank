@@ -63,7 +63,7 @@ Example command lines:
 
 ** Generate eccentric template bank with aligned spins using ecc IMR waveform.
 
-sbank --approximant IMRPhenomXE --aligned-spin \\
+sbank --approximant IMRPhenomXE --aligned-spin --use-eccentric \\
         --mass1-min 15.0 --mass1-max 25.0 \\
         --spin1-min 0.0 --spin1-max 0.5 \\
         --mass2-min 10.0 --mass2-max 15.0 \\
@@ -153,7 +153,7 @@ def checkpoint_save(xmldoc, fout, process):
     utils.write_filename(xmldoc, fout + "_checkpoint.gz")
 
 
-aligned_spin_approx = ["TaylorF2RedSpin",
+aligned_spin_approxs = ["TaylorF2RedSpin",
         "IMRPhenomB","IMRPhenomC", "IMRPhenomD", "IMRPhenomXE", "IMRPhenomXEv1",
         "SEOBNRv1", "SEOBNRv2", "SEOBNRv2_ROM_DoubleSpin", "SEOBNRv2_ROM_DoubleSpin_HI"]
 

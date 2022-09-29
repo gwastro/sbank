@@ -537,9 +537,9 @@ def IMRPhenomXE_param_generator(flow, tmplt_class, bank, **kwargs):
     @param kwargs: constraints on waveform parameters. See urand_tau0tau3_generator for more usage help. If no spin limits are specified, the IMRPhenomXE limits will be used.
     """  # noqa: E501
 
-    s1min, s1max = kwargs.pop('spin1', (s1min, s1max))
-    s2min, s2max = kwargs.pop('spin2', (s2min, s2max))
-    ecc_min, ecc_max = kwargs.pop('eccentricity', (ecc_min, ecc_max))
+    s1min, s1max = kwargs.pop('spin1', (-0.99, 0.99))
+    s2min, s2max = kwargs.pop('spin2', (-0.99, 0.99))
+    ecc_min, ecc_max = kwargs.pop('eccentricity', (0.0, 0.3))
     mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (mean_per_ano_min, mean_per_ano_max))
     f_ref = kwargs.get('f_ref', 10.)
 
@@ -569,9 +569,9 @@ def eccentric_aligned_spin_param_generator(flow, tmplt_class, bank, **kwargs):
     Currently to be used with PhenomXE and has eccentricity range of 0 <= ecc < 0.3.
     """
     dur_min, dur_max = kwargs.pop('duration', (None, None))
-    ecc_min, ecc_max = kwargs.pop('eccentricity', (ecc_min, ecc_max))
+    ecc_min, ecc_max = kwargs.pop('eccentricity', (0.0, 0.3))
     ecc_min, ecc_max = (max(0,ecc_min), min(ecc_max, 0.3))
-    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (mean_per_ano_min, mean_per_ano_max))
+    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (0, 6.28))
     f_ref = kwargs.get('f_ref', 10.)
 
     # define a helper function to apply the appropriate spin bounds
