@@ -488,6 +488,13 @@ class IMRPhenomDTemplate(IMRAlignedSpinTemplate):
         # may want to FIXME if that changes
         return dur * 1.1
 
+## FIXME: Maybe phenomD class is correcta or add correct duration function
+# class IMRPhenomXASTemplate(IMRPhenomDTemplate):
+#     approximant = "IMRPhenomXAS"
+
+class IMRPhenomXASTemplate(SEOBNRv4Template):
+        approximant = "IMRPhenomXAS"
+
 
 class SEOBNRv2Template(IMRAlignedSpinTemplate):
     approximant = "SEOBNRv2"
@@ -676,8 +683,13 @@ class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
             0., self.eccentricity, self.mean_per_ano,
             df, self.flow, f_final, self.f_ref,
             LALpars, approx)
-
         return hplus_fd
+
+    def _get_f_final(self):
+        f_final = 1024.
+        return f_final
+        # return self._get_isco_f_final()
+
 
     def _get_chirp_dur(self):
         return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, self._f_final)
@@ -1040,9 +1052,11 @@ waveforms = {
     "TaylorF2": TaylorF2Template,
     "IMRPhenomB": IMRPhenomBTemplate,
     "IMRPhenomC": IMRPhenomCTemplate,
+    "IMRPhenomD": IMRPhenomDTemplate,
+    "IMRPhenomD": IMRPhenomDTemplate,
+    "IMRPhenomXAS": IMRPhenomXASTemplate,
     "IMRPhenomXE": IMRPhenomXETemplate,
     "IMRPhenomXEv1": IMRPhenomXETemplate,
-    "IMRPhenomD": IMRPhenomDTemplate,
     "IMRPhenomP": IMRPhenomPTemplate,
     "IMRPhenomPv2": IMRPhenomPv2Template,
     "SEOBNRv2": SEOBNRv2Template,
