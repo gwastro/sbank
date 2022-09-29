@@ -24,7 +24,12 @@ from six.moves import range
 
 import numpy as np
 
-from lal.iterutils import inorder, uniq
+try:
+    from lal.iterutils import inorder, uniq
+except:
+    from .lal_iterutils import inorder, uniq
+
+
 from .overlap import SBankWorkspaceCache
 from .psds import get_neighborhood_ASD, get_PSD, get_neighborhood_df_fmax
 from . import waveforms
