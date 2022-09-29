@@ -122,72 +122,11 @@ def get_h22_jn2nm2(m1, m2, chi1,chi2,dMpc, f_min, f_max, deltaF, phiRef, f_ref, 
 def AmpPhysicaltoNR(ampphysical, M, dMpc):
     return ampphysical*dMpc*1000000*LALPCSI/(LALCSI*( M*LALMTSUNSI)**2)
 
-# def get_XE_chirptime_all(m1, m2, chi1,chi2,dMpc, f_min, f_max, deltaF, phiRef, f_ref, e0,l0,approximant):
-#
-#     distance = dMpc*1.0e6*lal.PC_SI
-#     mtotal = m1+m2
-#     m1SI = m1*lal.MSUN_SI
-#     m2SI = m2*lal.MSUN_SI
-#     Mtot_sec = mtotal*lal.MTSUN_SI
-#     # Convert starting frequency to Mf
-#     Mfmin = f_min*Mtot_sec
-#
-#     f_minwf = 0.98*f_min #Offset in fmin, to not have problems later with the derivative at fmin
-#
-#     # Peak frequency based on PhenomD estimate
-#     Mfpeak = lalsimulation.IMRPhenomDGetPeakFreq(m1,m2,chi1,chi2)*Mtot_sec
-#
-#     LAL_params_template = lal.CreateDict()
-#     Nharmonic=1
-#     kAdvance=1
-#     lalsimulation.SimInspiralWaveformParamsInsertPhenomXENHarmonics(LAL_params_template, Nharmonic)
-#     lalsimulation.SimInspiralWaveformParamsInsertPhenomXEPeriastronAdvance(LAL_params_template, kAdvance)
-#
-#     if approximant == "IMRPhenomXAS":
-#         h22 = lalsimulation.SimIMRPhenomXASGenerateFD(m1SI, m2SI, chi1,chi2,distance, f_minwf, f_max, deltaF,
-#                                                 phiRef, f_ref, LAL_params_template)
-#     else:
-#         h22 = lalsimulation.SimIMRPhenomXEv1_opt_GenerateFD(m1SI, m2SI, chi1,chi2,distance, f_minwf, f_max, deltaF,
-#                                                     phiRef, f_ref, e0,l0, LAL_params_template)
-#
-#
-#     h22_py = FrequencySeries(h22.data.data, delta_f = deltaF)
-#
-#     h22_NR = AmpPhysicaltoNR(h22.data.data, mtotal, dMpc)
-#
-#     Mfreq = h22_py.get_sample_frequencies()*Mtot_sec
-#
-#     #Mfreq = freq*(mtotal*lal.MTSUN_SI)
-#     #print(Mfreq)
-#     #amp22 = np.abs(h22_NR)
-#     phase22 = np.unwrap(np.angle(h22_NR))
-#     iphase22 = InterpolatedUnivariateSpline(Mfreq,phase22)
-#
-#
-#     idph22df_Mfmin = iphase22.derivative()(Mfmin)
-#     idph22df_Mfpeak = iphase22.derivative()(Mfpeak)
-#
-# #     print(f"Mfmin = {Mfmin}, idph22df_Mfmin = {idph22df_Mfmin}")
-# #     print(f"Mfpeak = {Mfpeak}, idph22df_Mfpeak = {idph22df_Mfpeak}")
-#     t_corr = np.abs(idph22df_Mfpeak/(2.*np.pi)-idph22df_Mfmin/(2*np.pi)) #positive time spent from f_min to f_peak
-#
-#     t_corr_s = t_corr*Mtot_sec
-#
-#     print("Estimated time = {} M ".format(t_corr))
-#     print("Estimated time = {} s ".format(t_corr_s))
-#
-#     t_corr_D_s = lalsimulation.SimIMRPhenomDChirpTime(m1SI,m2SI,chi1,chi2,f_min)
-#     t_corr_D = t_corr_D_s/Mtot_sec
-#
-#     print("Estimated time phenomD = {} M ".format(t_corr_D))
-#     print("Estimated time phenomD = {} s ".format(t_corr_D_s))
-#
-#     return t_corr,t_corr_s,Mfreq, phase22
 
+def get_XE_chirptime(m1, m2, chi1, chi2, e0, l0, f_ref, f_min, f_max=None, deltaF=1./8., phiRef=0, approximant='IMRPhenomXEv1'):
 
-
-
-def get_XE_chirptime(m1, m2, chi1, chi2, e0, l0, f_ref, f_min, f_max=1024., deltaF=1./128., phiRef=0, approximant='IMRPhenomXEv1'):
+    if f_max is None:
+        f_max = 1024.
 
     distance = 1.0e9*lal.PC_SI
     mtotal = m1+m2

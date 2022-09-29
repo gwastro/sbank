@@ -680,10 +680,10 @@ class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
         return hplus_fd
 
     def _get_chirp_dur(self):
-        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, f_final)
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, self._f_final)
 
     def _get_dur(self):
-        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, f_final)
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, self._f_final)
 
 
 
