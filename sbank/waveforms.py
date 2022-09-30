@@ -675,14 +675,18 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
         if not flow > 0:
             flow = None
 
-        duration = None
-        if hasattr('template_duration', params):
-            duration = float(params['template_duration'][idx])
-            if not duration > 0:
-                duration = None
-        f_ref = flat(params['f_ref'][idx]) if hasattr('f_ref', params) else None
-        ecc = flat(params['eccentricity'][idx]) if hasattr('eccentricity', params) else 0.0
-        mean_per_ano = flat(params['mean_per_ano'][idx]) if hasattr('mean_per_ano', params) else 0.0
+        # duration = None
+        # if hasattr('template_duration', params):
+        #     duration = float(params['template_duration'][idx])
+        #     if not duration > 0:
+        #         duration = None
+        # f_ref = flat(params['f_ref'][idx]) if hasattr('f_ref', params) else None
+        # ecc = flat(params['eccentricity'][idx]) if hasattr('eccentricity', params) else 0.0
+        # mean_per_ano = flat(params['mean_per_ano'][idx]) if hasattr('mean_per_ano', params) else 0.0
+        duration = float(params['template_duration'][idx]) if 'template_duration' in params else None
+        f_ref = float(params['f_ref'][idx]) if 'f_ref' in params else None
+        ecc = float(params['eccentricity'][idx]) if 'eccentricity' in params else 0.0
+        mean_per_ano = float(params['mean_per_ano'][idx]) if 'mean_per_ano' in params else 0.0
 
         return cls(float(params['mass1'][idx]), float(params['mass2'][idx]),
                    float(params['spin1z'][idx]), float(params['spin2z'][idx]),
