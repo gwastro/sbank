@@ -138,6 +138,7 @@ class Bank(object):
                     tmp[name] = hdf_fp[name][idx:end_idx]
             c_idx = idx % 100000
             approx = tmp['approximant'][c_idx].decode('utf-8')
+            print(approx)
             tmplt_class = waveforms.waveforms[approx]
             newtmplts.append(tmplt_class.from_dict(tmp, c_idx, self))
             newtmplts[-1].is_seed_point = True

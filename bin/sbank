@@ -410,6 +410,7 @@ bank = Bank(noise_model, opts.flow, opts.use_metric, opts.cache_waveforms, opts.
             opts.neighborhood_param, coarse_match_df=opts.coarse_match_df,
             iterative_match_df_max=opts.iterative_match_df_max, fhigh_max=opts.fhigh_max,
             optimize_flow=opts.optimize_flow)
+
 for file_approx in opts.bank_seed:
 
     # if no approximant specified, use same approximant as the
@@ -420,6 +421,9 @@ for file_approx in opts.bank_seed:
     else:
         # if this fails, you have an input error
         seed_file, approx = file_approx.split(":")
+
+    print("seed_file, approx")
+    print(seed_file, approx)
 
     # add templates to bank
     if opts.output_filename.endswith(('.xml', '.xml.gz')):

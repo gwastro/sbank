@@ -488,13 +488,6 @@ class IMRPhenomDTemplate(IMRAlignedSpinTemplate):
         # may want to FIXME if that changes
         return dur * 1.1
 
-## FIXME: Maybe phenomD class is correcta or add correct duration function
-# class IMRPhenomXASTemplate(IMRPhenomDTemplate):
-#     approximant = "IMRPhenomXAS"
-
-class IMRPhenomXASTemplate(SEOBNRv4Template):
-        approximant = "IMRPhenomXAS"
-
 
 class SEOBNRv2Template(IMRAlignedSpinTemplate):
     approximant = "SEOBNRv2"
@@ -530,6 +523,14 @@ class SEOBNRv4Template(IMRAlignedSpinTemplate):
 
 class SEOBNRv4ROMTemplate(SEOBNRv4Template):
     approximant = "SEOBNRv4_ROM"
+
+
+## FIXME: Maybe phenomD class is correcta or add correct duration function
+# class IMRPhenomXASTemplate(IMRPhenomDTemplate):
+#     approximant = "IMRPhenomXAS"
+
+class IMRPhenomXASTemplate(SEOBNRv4Template):
+        approximant = "IMRPhenomXAS"
 
 
 class EOBNRv2Template(SEOBNRv2Template):
@@ -647,10 +648,11 @@ class TaylorF2Template(InspiralAlignedSpinTemplate):
 class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
     """
     """
+    approximant = "IMRPhenomXEv1"
     param_names = ("m1", "m2", "spin1z", "spin2z", "eccentricity", "mean_per_ano", "f_ref")
     param_formats = ("%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f")
     hdf_dtype = AlignedSpinTemplate.hdf_dtype + \
-            [('eccentricity', float), ('mean_per_ano', float)]
+            [('eccentricity', float), ('mean_per_ano', float), ('f_ref', float)]
 
     def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref=None, bank=None, flow=None, duration=None):
         AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
@@ -672,12 +674,19 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
         flow = float(params['f_lower'][idx])
         if not flow > 0:
             flow = None
-        duration = float(params['template_duration'][idx])
-        if not duration > 0:
-            duration = None
+
+        duration = None
+        if hasattr('template_duration', params):
+            duration = float(params['template_duration'][idx])
+            if not duration > 0:
+                duration = None
+        f_ref = flat(params['f_ref'][idx]) if hasattr('f_ref', params) else None
+        ecc = flat(params['eccentricity'][idx]) if hasattr('eccentricity', params) else 0.0
+        mean_per_ano = flat(params['mean_per_ano'][idx]) if hasattr('mean_per_ano', params) else 0.0
+
         return cls(float(params['mass1'][idx]), float(params['mass2'][idx]),
                    float(params['spin1z'][idx]), float(params['spin2z'][idx]),
-                   float(params['eccentricity'][idx]), float(params['mean_per_ano'][idx]),
+                   ecc, mean_per_ano, f_ref,
                    bank, flow=flow, duration=duration)
 
     def to_storage_arr(self):
@@ -686,10 +695,12 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
         new_tmplt['eccentricity'] = self.eccentricity
         new_tmplt['mean_per_ano'] = self.mean_per_ano
         new_tmplt['f_ref'] = self.f_ref
+        return new_tmplt
 
 
 class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
     approx_name = "IMRPhenomXEv1"
+    approximant = "IMRPhenomXEv1"
 
     def _compute_waveform(self, df, f_final):
         phi0 = 0  # This is a reference phase, and not an intrinsic parameter

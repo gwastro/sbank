@@ -158,7 +158,7 @@ def get_XE_chirptime(m1, m2, chi1, chi2, e0, l0, f_ref, f_min, f_max=None, delta
     h22_py = FrequencySeries(h22.data.data, delta_f = deltaF)
     Mfreq = h22_py.get_sample_frequencies()*Mtot_sec
 
-    h22_NR = AmpPhysicaltoNR(h22.data.data, mtotal, dMpc)
+    h22_NR = AmpPhysicaltoNR(h22.data.data, mtotal, distance)
     phase22 = np.unwrap(np.angle(h22_NR))
     iphase22 = InterpolatedUnivariateSpline(Mfreq,phase22)
 
