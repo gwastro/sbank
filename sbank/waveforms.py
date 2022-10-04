@@ -655,11 +655,11 @@ class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
             [('eccentricity', float), ('mean_per_ano', float), ('f_ref', float)]
 
     def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref=None, bank=None, flow=None, duration=None):
-        AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
-                                     flow=flow, duration=duration)
         self.eccentricity = float(eccentricity)
         self.mean_per_ano = float(mean_per_ano)
         self.f_ref = float(f_ref) if f_ref else 10.
+        AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
+                                     flow=flow, duration=duration)
         self._wf = {}
         self._metric = None
         self.sigmasq = 0.
