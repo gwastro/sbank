@@ -35,11 +35,11 @@ BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
 # runtime dependencies (required for %check and help2man)
 BuildRequires: help2man
 BuildRequires: lalapps
-BuildRequires: python%{python3_pkgversion}-glue
 BuildRequires: python%{python3_pkgversion}-h5py
 BuildRequires: python%{python3_pkgversion}-lal
 BuildRequires: python%{python3_pkgversion}-lalsimulation
 BuildRequires: python%{python3_pkgversion}-ligo-lw-bin
+BuildRequires: python%{python3_pkgversion}-lscsoft-glue
 BuildRequires: python%{python3_pkgversion}-matplotlib
 BuildRequires: python%{python3_pkgversion}-scipy
 BuildRequires: python%{python3_pkgversion}-six
@@ -73,11 +73,11 @@ Summary: Command-line utilities for Sbank
 BuildArch: noarch
 Requires: lalapps
 Requires: python%{python3_pkgversion}-%{srcname} = %{version}-%{release}
-Requires: python%{python3_pkgversion}-glue
 Requires: python%{python3_pkgversion}-h5py
 Requires: python%{python3_pkgversion}-lal
 Requires: python%{python3_pkgversion}-lalsimulation
 Requires: python%{python3_pkgversion}-ligo-lw-bin
+Requires: python%{python3_pkgversion}-lscsoft-glue
 Requires: python%{python3_pkgversion}-matplotlib
 Requires: python%{python3_pkgversion}-numpy
 Requires: python%{python3_pkgversion}-scipy
@@ -90,9 +90,9 @@ The package provides the command-line utilities.
 
 %package -n python%{python3_pkgversion}-%{srcname}
 Summary: Python %{python3_version} library for Sbank
-Requires: python%{python3_pkgversion}-glue
 Requires: python%{python3_pkgversion}-lal
 Requires: python%{python3_pkgversion}-lalsimulation
+Requires: python%{python3_pkgversion}-lscsoft-glue
 Requires: python%{python3_pkgversion}-numpy
 Requires: python%{python3_pkgversion}-six
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
