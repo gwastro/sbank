@@ -29,7 +29,7 @@ If you use sbank in scientific publication, please see our citation guidelines
 <https://pycbc.org/pycbc/latest/html/tmpltbank.html#tmpltbank-alignedstochbank>
 contains the important details).
 
-![Structure of sbank](./tools/sbank_structure_ini.svg?raw=true "Structure of sbank")
+![Structure of sbank](./tools/sbank_structure.png?raw=true "Structure of sbank")
 
 "Structure of sbank" image courtesy of Han Wang, Sun Yat-sen University.
 
