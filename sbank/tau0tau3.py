@@ -662,6 +662,8 @@ proposals = {
     "SEOBNRv2_ROM_DoubleSpin_HI": aligned_spin_param_generator,
     "SEOBNRv4": aligned_spin_param_generator,
     "SEOBNRv4_ROM": aligned_spin_param_generator,
+    "SEOBNRv5": aligned_spin_param_generator,
+    "SEOBNRv5_ROM": aligned_spin_param_generator,
     "SpinTaylorT4": SpinTaylorT4_param_generator,
     "SpinTaylorF2": single_spin_precessing_param_generator,
     "SpinTaylorT5Fourier": double_spin_precessing_param_generator,
