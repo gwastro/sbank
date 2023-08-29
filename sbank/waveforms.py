@@ -486,6 +486,22 @@ class IMRPhenomDTemplate(IMRAlignedSpinTemplate):
         return dur * 1.1
 
 
+class IMRPhenomXASTemplate(IMRAlignedSpinTemplate):
+    approximant = "IMRPhenomXAS"
+
+    def _get_dur(self):
+        dur = lalsim.SimIMRPhenomXASDuration(
+            self.m1 * MSUN_SI,
+            self.m2 * MSUN_SI,
+            self.spin1z,
+            self.spin2z,
+            self.flow
+        )
+        # add a 10% to be consistent with PyCBC's duration estimate,
+        # may want to FIXME if that changes
+        return dur * 1.1
+
+
 class SEOBNRv2Template(IMRAlignedSpinTemplate):
     approximant = "SEOBNRv2"
 
@@ -1009,6 +1025,7 @@ waveforms = {
     "IMRPhenomD": IMRPhenomDTemplate,
     "IMRPhenomP": IMRPhenomPTemplate,
     "IMRPhenomPv2": IMRPhenomPv2Template,
+    "IMRPhenomXAS": IMRPhenomXASTemplate,
     "SEOBNRv2": SEOBNRv2Template,
     "SEOBNRv2_ROM_DoubleSpin": SEOBNRv2ROMDoubleSpinTemplate,
     "SEOBNRv2_ROM_DoubleSpin_HI": SEOBNRv2ROMDoubleSpinHITemplate,

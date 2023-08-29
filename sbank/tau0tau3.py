@@ -651,6 +651,7 @@ proposals = {
     "IMRPhenomB": IMRPhenomB_param_generator,
     "IMRPhenomC": IMRPhenomC_param_generator,
     "IMRPhenomD": aligned_spin_param_generator,
+    "IMRPhenomXAS": aligned_spin_param_generator,
     "TaylorF2": aligned_spin_param_generator,
     "IMRPhenomP": double_spin_precessing_param_generator,
     "IMRPhenomPv2": double_spin_precessing_param_generator,
