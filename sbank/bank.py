@@ -24,7 +24,12 @@ from six.moves import range
 
 import numpy as np
 
-from lal.iterutils import inorder, uniq
+try:
+    from lal.iterutils import inorder, uniq
+except:
+    from .lal_iterutils import inorder, uniq
+
+
 from .overlap import SBankWorkspaceCache
 from .psds import get_neighborhood_ASD, get_PSD, get_neighborhood_df_fmax
 from . import waveforms
@@ -133,6 +138,7 @@ class Bank(object):
                     tmp[name] = hdf_fp[name][idx:end_idx]
             c_idx = idx % 100000
             approx = tmp['approximant'][c_idx].decode('utf-8')
+            print(approx)
             tmplt_class = waveforms.waveforms[approx]
             newtmplts.append(tmplt_class.from_dict(tmp, c_idx, self))
             newtmplts[-1].is_seed_point = True

@@ -20,7 +20,7 @@ from __future__ import division
 from math import sqrt
 
 import numpy
-from numpy.random.mtrand import uniform
+from numpy.random.mtrand import uniform, power
 
 from lal import PI, MTSUN_SI
 
@@ -522,6 +522,134 @@ def IMRPhenomC_param_generator(flow, tmplt_class, bank, **kwargs):
         yield tmplt_class(mass1, mass2, spin1, spin2, bank=bank)
 
 
+def IMRPhenomXAS_param_generator(flow, tmplt_class, bank, **kwargs):
+    """
+    Generate random parameters for the IMRPhenomXE waveform model.
+    Specify the min and max mass of the bigger component, then the min
+    and max mass of the total mass. This function includes
+    restrictions on q and chi based on IMRPhenomC's range of
+    believability, namely q <=50 and |chi1,2| <= 0.99 and 0 <= ecc < 0.3.
+
+    @param flow: low frequency cutoff
+    @param f_ref: reference frequency at which ecc and spins are to be specified.
+    @param tmplt_class: Template generation class for this waveform
+    @param bank: sbank bank object
+    @param kwargs: constraints on waveform parameters. See urand_tau0tau3_generator for more usage help. If no spin limits are specified, the IMRPhenomXE limits will be used.
+    """  # noqa: E501
+
+    s1min, s1max = kwargs.pop('spin1', (-0.99, 0.99))
+    s2min, s2max = kwargs.pop('spin2', (-0.99, 0.99))
+    s1min, s1max = (max(-0.99, s1min), min(0.99, s1max))
+    s2min, s2max = (max(-0.99, s2min), min(0.99, s2max))
+
+    for mass1, mass2 in urand_tau0tau3_generator(flow, **kwargs):
+
+        q = max(mass1/mass2, mass2/mass1)
+        if q <= 50:
+            spin1 = uniform(s1min, s1max)
+            spin2 = uniform(s2min, s2max)
+        else:
+            raise ValueError("mass ratio out of range")
+
+        yield tmplt_class(mass1, mass2, spin1, spin2, bank=bank)
+
+
+def IMRPhenomXE_param_generator(flow, tmplt_class, bank, **kwargs):
+    """
+    Generate random parameters for the IMRPhenomXE waveform model.
+    Specify the min and max mass of the bigger component, then the min
+    and max mass of the total mass. This function includes
+    restrictions on q and chi based on IMRPhenomC's range of
+    believability, namely q <=50 and |chi1,2| <= 0.99 and 0 <= ecc < 0.3.
+
+    @param flow: low frequency cutoff
+    @param f_ref: reference frequency at which ecc and spins are to be specified.
+    @param tmplt_class: Template generation class for this waveform
+    @param bank: sbank bank object
+    @param kwargs: constraints on waveform parameters. See urand_tau0tau3_generator for more usage help. If no spin limits are specified, the IMRPhenomXE limits will be used.
+    """  # noqa: E501
+
+    s1min, s1max = kwargs.pop('spin1', (-0.99, 0.99))
+    s2min, s2max = kwargs.pop('spin2', (-0.99, 0.99))
+    ecc_min, ecc_max = kwargs.pop('eccentricity', (0.0, 0.3))
+    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (0., 6.28))
+    f_ref = kwargs.get('f_ref', 10.)
+
+    s1min, s1max = (max(-0.99, s1min), min(0.99, s1max))
+    s2min, s2max = (max(-0.99, s2min), min(0.99, s2max))
+    ecc_min, ecc_max = (max(0,ecc_min), min(ecc_max, 0.3))
+
+    for mass1, mass2 in urand_tau0tau3_generator(flow, **kwargs):
+
+        q = max(mass1/mass2, mass2/mass1)
+        if q <= 50:
+            spin1 = uniform(s1min, s1max)
+            spin2 = uniform(s2min, s2max)
+            # eccentricity = uniform(ecc_min, ecc_max)
+            ## We try to use quadratic power law for ecc
+            eccentricity = ecc_min + power(2) * (ecc_max - ecc_min)
+            mean_per_ano = uniform(mean_per_ano_min, mean_per_ano_max)
+        else:
+            raise ValueError("mass ratio out of range")
+
+        yield tmplt_class(mass1, mass2, spin1, spin2, eccentricity, mean_per_ano, f_ref, bank=bank)
+
+
+def eccentric_aligned_spin_param_generator(flow, tmplt_class, bank, **kwargs):
+    """
+    Specify the min and max mass of the bigger component, the min and
+    max mass of the total mass and the min and max values for the
+    z-axis spin angular momentum.
+    Currently to be used with PhenomXE and has eccentricity range of 0 <= ecc < 0.3.
+    """
+    dur_min, dur_max = kwargs.pop('duration', (None, None))
+    ecc_min, ecc_max = kwargs.pop('eccentricity', (0.0, 0.3))
+    ecc_min, ecc_max = (max(0,ecc_min), min(ecc_max, 0.3))
+    mean_per_ano_min, mean_per_ano_max = kwargs.pop('mean_per_ano', (0, 6.28))
+    f_ref = kwargs.get('f_ref', 10.)
+
+    # define a helper function to apply the appropriate spin bounds
+    if 'ns_bh_boundary_mass' in kwargs and 'bh_spin' in kwargs \
+            and 'ns_spin' in kwargs:
+        bh_spin_bounds = kwargs.pop('bh_spin')
+        ns_spin_bounds = kwargs.pop('ns_spin')
+        ns_bh_boundary = kwargs.pop('ns_bh_boundary_mass')
+
+        def spin_bounds(mass1, mass2):
+            return (bh_spin_bounds if mass1 > ns_bh_boundary else ns_spin_bounds), \
+                   (bh_spin_bounds if mass2 > ns_bh_boundary else ns_spin_bounds)
+    else:
+        spin1b = kwargs.pop('spin1', (-1., 1.))
+        spin2b = kwargs.pop('spin2', (-1., 1.))
+
+        def spin_bounds(mass1, mass2):
+            return spin1b, spin2b
+
+    # the rest will be checked in the call to urand_tau0tau3_generator
+    for mass1, mass2 in urand_tau0tau3_generator(flow, **kwargs):
+
+        spin1_bounds, spin2_bounds = spin_bounds(mass1, mass2)
+
+        mtot = mass1 + mass2
+        chis_min = (mass1*spin1_bounds[0] + mass2*spin2_bounds[0])/mtot
+        chis_max = (mass1*spin1_bounds[1] + mass2*spin2_bounds[1])/mtot
+        chis = uniform(chis_min, chis_max)
+
+        s2min = max(spin2_bounds[0], (mtot*chis - mass1*spin1_bounds[1])/mass2)
+        s2max = min(spin2_bounds[1], (mtot*chis - mass1*spin1_bounds[0])/mass2)
+
+        spin2 = uniform(s2min, s2max)
+        spin1 = (chis*mtot - mass2*spin2)/mass1
+
+        eccentricity = uniform(ecc_min, ecc_max)
+        mean_per_ano = uniform(mean_per_ano_min, mean_per_ano_max)
+
+        t = tmplt_class(mass1, mass2, spin1, spin2, eccentricity, mean_per_ano, f_ref=f_ref, bank=bank)
+        if (dur_min is not None and t.dur < dur_min) \
+                or (dur_max is not None and t.dur > dur_max):
+            continue
+        yield t
+
 def aligned_spin_param_generator(flow, tmplt_class, bank, **kwargs):
     """
     Specify the min and max mass of the bigger component, the min and
@@ -650,6 +778,9 @@ def nonspin_hom_param_generator(flow, tmplt_class, bank, **constraints):
 proposals = {
     "IMRPhenomB": IMRPhenomB_param_generator,
     "IMRPhenomC": IMRPhenomC_param_generator,
+    "IMRPhenomXAS": IMRPhenomXAS_param_generator,
+    "IMRPhenomXE": IMRPhenomXE_param_generator,
+    "IMRPhenomXEv1": IMRPhenomXE_param_generator,
     "IMRPhenomD": aligned_spin_param_generator,
     "TaylorF2": aligned_spin_param_generator,
     "IMRPhenomP": double_spin_precessing_param_generator,

@@ -31,6 +31,7 @@ from ligo.lw.lsctables import SnglInspiralTable as llwsit
 from .overlap import SBankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD
 from .tau0tau3 import m1m2_to_tau0tau3
+from .phenomxe_utils import get_XE_chirptime
 
 np.seterr(all="ignore")
 _sit_cols = llwsit.validcolumns
@@ -524,6 +525,14 @@ class SEOBNRv4ROMTemplate(SEOBNRv4Template):
     approximant = "SEOBNRv4_ROM"
 
 
+## FIXME: Maybe phenomD class is correcta or add correct duration function
+# class IMRPhenomXASTemplate(IMRPhenomDTemplate):
+#     approximant = "IMRPhenomXAS"
+
+class IMRPhenomXASTemplate(SEOBNRv4Template):
+        approximant = "IMRPhenomXAS"
+
+
 class EOBNRv2Template(SEOBNRv2Template):
     approximant = "EOBNRv2"
     param_names = ("m1", "m2")
@@ -634,6 +643,95 @@ class TaylorF2Template(InspiralAlignedSpinTemplate):
         hplus_fd.data.data[f_max_idx:] = 0
 
         return hplus_fd
+
+
+class EccentricAlignedSpinTemplate(AlignedSpinTemplate):
+    """
+    """
+    approximant = "IMRPhenomXEv1"
+    param_names = ("m1", "m2", "spin1z", "spin2z", "eccentricity", "mean_per_ano", "f_ref")
+    param_formats = ("%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f", "%.2f")
+    hdf_dtype = AlignedSpinTemplate.hdf_dtype + \
+            [('eccentricity', float), ('mean_per_ano', float), ('f_ref', float)]
+
+    def __init__(self, m1, m2, spin1z, spin2z, eccentricity, mean_per_ano, f_ref=None, bank=None, flow=None, duration=None):
+        self.eccentricity = float(eccentricity)
+        self.mean_per_ano = float(mean_per_ano)
+        self.f_ref = float(f_ref) if f_ref else 10.
+        AlignedSpinTemplate.__init__(self, m1, m2, spin1z, spin2z, bank,
+                                     flow=flow, duration=duration)
+        self._wf = {}
+        self._metric = None
+        self.sigmasq = 0.
+        self._mchirp = compute_mchirp(m1, m2)
+        self.tau0_40 = compute_tau0_40(self._mchirp)
+        self.tau0 = compute_tau0(self._mchirp, bank.flow)
+        self._dur = duration
+        self._f_final = None
+
+    @classmethod
+    def from_dict(cls, params, idx, bank):
+        flow = float(params['f_lower'][idx])
+        if not flow > 0:
+            flow = None
+
+        # duration = None
+        # if hasattr('template_duration', params):
+        #     duration = float(params['template_duration'][idx])
+        #     if not duration > 0:
+        #         duration = None
+        # f_ref = flat(params['f_ref'][idx]) if hasattr('f_ref', params) else None
+        # ecc = flat(params['eccentricity'][idx]) if hasattr('eccentricity', params) else 0.0
+        # mean_per_ano = flat(params['mean_per_ano'][idx]) if hasattr('mean_per_ano', params) else 0.0
+        duration = float(params['template_duration'][idx]) if 'template_duration' in params else None
+        f_ref = float(params['f_ref'][idx]) if 'f_ref' in params else None
+        ecc = float(params['eccentricity'][idx]) if 'eccentricity' in params else 0.0
+        mean_per_ano = float(params['mean_per_ano'][idx]) if 'mean_per_ano' in params else 0.0
+
+        return cls(float(params['mass1'][idx]), float(params['mass2'][idx]),
+                   float(params['spin1z'][idx]), float(params['spin2z'][idx]),
+                   ecc, mean_per_ano, f_ref,
+                   bank, flow=flow, duration=duration)
+
+    def to_storage_arr(self):
+        """Dump the template params to a numpy array."""
+        new_tmplt = super(EccentricAlignedSpinTemplate, self).to_storage_arr()
+        new_tmplt['eccentricity'] = self.eccentricity
+        new_tmplt['mean_per_ano'] = self.mean_per_ano
+        new_tmplt['f_ref'] = self.f_ref
+        return new_tmplt
+
+
+class IMRPhenomXETemplate(EccentricAlignedSpinTemplate):
+    approx_name = "IMRPhenomXEv1"
+    approximant = "IMRPhenomXEv1"
+
+    def _compute_waveform(self, df, f_final):
+        phi0 = 0  # This is a reference phase, and not an intrinsic parameter
+        LALpars = lal.CreateDict()
+        approx = lalsim.GetApproximantFromString(self.approx_name)
+        hplus_fd, hcross_fd = lalsim.SimInspiralChooseFDWaveform(
+            self.m1*MSUN_SI, self.m2*MSUN_SI,
+            0., 0., self.spin1z,
+            0., 0., self.spin2z,
+            1.e6*PC_SI, 0., phi0,
+            0., self.eccentricity, self.mean_per_ano,
+            df, self.flow, f_final, self.f_ref,
+            LALpars, approx)
+        return hplus_fd
+
+    def _get_f_final(self):
+        f_final = 1024.
+        return f_final
+        # return self._get_isco_f_final()
+
+
+    def _get_chirp_dur(self):
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, self._f_final)
+
+    def _get_dur(self):
+        return get_XE_chirptime(self.m1, self.m2, self.spin1z, self.spin2z, self.eccentricity, self.mean_per_ano, self.f_ref, self.flow, self._f_final)
+
 
 
 class PrecessingSpinTemplate(AlignedSpinTemplate):
@@ -990,6 +1088,10 @@ waveforms = {
     "IMRPhenomB": IMRPhenomBTemplate,
     "IMRPhenomC": IMRPhenomCTemplate,
     "IMRPhenomD": IMRPhenomDTemplate,
+    "IMRPhenomD": IMRPhenomDTemplate,
+    "IMRPhenomXAS": IMRPhenomXASTemplate,
+    "IMRPhenomXE": IMRPhenomXETemplate,
+    "IMRPhenomXEv1": IMRPhenomXETemplate,
     "IMRPhenomP": IMRPhenomPTemplate,
     "IMRPhenomPv2": IMRPhenomPv2Template,
     "SEOBNRv2": SEOBNRv2Template,

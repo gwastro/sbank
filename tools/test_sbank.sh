@@ -22,3 +22,8 @@ if ((HDF_SIZE < 140 || HDF_SIZE > 160)); then
   exit 1
 fi
 
+
+## We can check ecc bank but currently, waveform approx is not openly available.
+## Bank works only in hdf form.
+# sbank --approximant IMRPhenomXE --aligned-spin --mass1-min 20.0 --mass1-max 24.0 --spin1-min 0.0 --spin1-max 0.25 --mass2-min 15.0 --mass2-max 18.0 --spin2-min 0.0 --spin2-max 0.5 --ecc-min 0.1 --ecc-max 0.2 --f-ref 10.0 --match-min 0.97 --flow 20.0 --noise-model aLIGOZeroDetHighPower --output-filename BBH-IMRPhenomXE-aLIGOZeroDetHighPower.hdf --verbose --use-eccentric
+
