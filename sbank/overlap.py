@@ -25,7 +25,7 @@ def SBankComputeMatch(inj, tmplt, workspace_cache, phase_maximized=True):
         min_len = inj.data.length
     else:
         min_len = tmplt.data.length
-    assert(inj.deltaF == tmplt.deltaF)
+    assert (inj.deltaF == tmplt.deltaF)
     delta_f = inj.deltaF
     if phase_maximized:
         return SBankCythonComputeMatch(inj.data.data, tmplt.data.data, min_len,
@@ -40,9 +40,9 @@ def SBankComputeMatchSkyLoc(hp, hc, hphccorr, proposal, workspace_cache1,
     """
     ADD ME
     """
-    assert(hp.deltaF == proposal.deltaF)
-    assert(hc.deltaF == proposal.deltaF)
-    assert(hp.data.length == hc.data.length)
+    assert (hp.deltaF == proposal.deltaF)
+    assert (hc.deltaF == proposal.deltaF)
+    assert (hp.data.length == hc.data.length)
     if proposal.data.length <= hp.data.length:
         min_len = proposal.data.length
     else:

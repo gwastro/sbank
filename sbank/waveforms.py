@@ -18,7 +18,6 @@
 from __future__ import (division, print_function)
 
 import logging
-import sys
 from math import isnan
 import numpy as np
 from numpy import float32
@@ -40,7 +39,7 @@ class SnglInspiralTable(llwsit):
     def __init__(self, *args, **kwargs):
         llwsit.__init__(self, *args, **kwargs)
         for entry in _sit_cols.keys():
-            if not(hasattr(self, entry)):
+            if not hasattr(self, entry):
                 if _sit_cols[entry] in ['real_4', 'real_8']:
                     setattr(self, entry, 0.)
                 elif _sit_cols[entry] == 'int_4s':
@@ -50,8 +49,7 @@ class SnglInspiralTable(llwsit):
                 elif _sit_cols[entry] == 'ilwd:char':
                     setattr(self, entry, '')
             else:
-                print("Column %s not recognized" % entry, file=sys.stderr)
-                raise ValueError
+                raise ValueError(f"Column {entry} not recognized")
 
 
 def compute_mchirp(m1, m2):
