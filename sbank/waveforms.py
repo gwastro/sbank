@@ -18,7 +18,6 @@
 from __future__ import (division, print_function)
 
 import logging
-import sys
 from math import isnan
 import numpy as np
 from numpy import float32
