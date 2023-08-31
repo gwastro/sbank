@@ -486,6 +486,22 @@ class IMRPhenomDTemplate(IMRAlignedSpinTemplate):
         return dur * 1.1
 
 
+class IMRPhenomXASTemplate(IMRAlignedSpinTemplate):
+    approximant = "IMRPhenomXAS"
+
+    def _get_dur(self):
+        dur = lalsim.SimIMRPhenomXASDuration(
+            self.m1 * MSUN_SI,
+            self.m2 * MSUN_SI,
+            self.spin1z,
+            self.spin2z,
+            self.flow
+        )
+        # add a 10% to be consistent with PyCBC's duration estimate,
+        # may want to FIXME if that changes
+        return dur * 1.1
+
+
 class SEOBNRv2Template(IMRAlignedSpinTemplate):
     approximant = "SEOBNRv2"
 
@@ -520,6 +536,25 @@ class SEOBNRv4Template(IMRAlignedSpinTemplate):
 
 class SEOBNRv4ROMTemplate(SEOBNRv4Template):
     approximant = "SEOBNRv4_ROM"
+
+
+class SEOBNRv5Template(IMRAlignedSpinTemplate):
+    approximant = "SEOBNRv5"
+
+    def _get_dur(self):
+        dur = lalsim.SimIMRSEOBNRv5ROMTimeOfFrequency(
+            self.flow,
+            self.m1 * MSUN_SI,
+            self.m2 * MSUN_SI,
+            self.spin1z,
+            self.spin2z
+        )
+        # Allow a 10% margin of error
+        return dur * 1.1
+
+
+class SEOBNRv5ROMTemplate(SEOBNRv5Template):
+    approximant = "SEOBNRv5_ROM"
 
 
 class EOBNRv2Template(SEOBNRv2Template):
@@ -990,11 +1025,14 @@ waveforms = {
     "IMRPhenomD": IMRPhenomDTemplate,
     "IMRPhenomP": IMRPhenomPTemplate,
     "IMRPhenomPv2": IMRPhenomPv2Template,
+    "IMRPhenomXAS": IMRPhenomXASTemplate,
     "SEOBNRv2": SEOBNRv2Template,
     "SEOBNRv2_ROM_DoubleSpin": SEOBNRv2ROMDoubleSpinTemplate,
     "SEOBNRv2_ROM_DoubleSpin_HI": SEOBNRv2ROMDoubleSpinHITemplate,
-    "SEOBNRv4": SEOBNRv4ROMTemplate,
+    "SEOBNRv4": SEOBNRv4Template,
     "SEOBNRv4_ROM": SEOBNRv4ROMTemplate,
+    "SEOBNRv5": SEOBNRv5Template,
+    "SEOBNRv5_ROM": SEOBNRv5ROMTemplate,
     "EOBNRv2": EOBNRv2Template,
     "SpinTaylorT4": SpinTaylorT4Template,
     "SpinTaylorT5": SpinTaylorT5Template,
