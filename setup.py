@@ -15,6 +15,7 @@ from Cython.Build import cythonize
 
 __author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
 
+
 # Ensure we can find lal libraries
 def pkgconfig(package, kw):
     flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
