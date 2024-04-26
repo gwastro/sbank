@@ -56,6 +56,8 @@ extension_kwargs = {
 # lal arguments
 extension_kwargs = pkgconfig('lal', extension_kwargs)
 
+print(extension_kwargs)
+
 # define compiled extensions
 exts = [
     Extension(
