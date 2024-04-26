@@ -56,7 +56,7 @@ jobs:
         key: ${{ runner.os }}-conda-${{ matrix.python-version}}-${{ env.CACHE_NUMBER }}
 
     - name: Configure conda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: test
         channels: conda-forge
