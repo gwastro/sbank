@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         # Needs some work to make wheels also on macos
-        os: [ubuntu-20.04]
+        os: [macos-12]
 
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v2
       - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==1.9.0
+        run: python -m pip install cibuildwheel==2.17.0
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
@@ -27,10 +27,10 @@ jobs:
           # pip is hard to link against. This symlinks it into /usr/lib so
           # that it can be found.
           CIBW_BEFORE_BUILD: bash tools/cibuildwheel_prep.sh
-          CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
+          CIBW_BUILD: cp36-manylinux* cp37-manylinux* cp38-manylinux* cp39-manylinux* cp310-manylinux* cp311-manylinux* cp312-manylinux* cp36-macosx* cp37-macosx* cp39-macosx*
           CIBW_ARCHS: auto64
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux_2_28
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
