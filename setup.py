@@ -21,6 +21,7 @@ def pkgconfig(package, kw):
     flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
     output = subprocess.getoutput(
         'pkg-config --cflags --libs {}'.format(package))
+    print(output)
     for token in output.strip().split():
         kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
     return kw
@@ -55,8 +56,6 @@ extension_kwargs = {
 
 # lal arguments
 extension_kwargs = pkgconfig('lal', extension_kwargs)
-
-print(extension_kwargs)
 
 # define compiled extensions
 exts = [
