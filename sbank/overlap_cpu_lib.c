@@ -23,7 +23,7 @@
 #include <sys/types.h>
 
 /* ---------------- LAL STUFF NEEDED ----------------- */
-int XLALPrintError(const char *fmt, ...)
+int XLALPrintError(const char *fmt, ...);
 
 typedef struct tagCOMPLEX8Vector {
      uint32_t length; /**< Number of elements in array. */
