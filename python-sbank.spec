@@ -19,34 +19,29 @@ Prefix:    %{_prefix}
 
 # -- requirements -----------
 
-# rpmbuild dependencies
-BuildRequires: python-srpm-macros
-BuildRequires: python-rpm-macros
-BuildRequires: python3-rpm-macros
-
 # build dependencies
 BuildRequires: gcc
 BuildRequires: liblal-devel
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-Cython
-BuildRequires: python%{python3_pkgversion}-numpy
-BuildRequires: python%{python3_pkgversion}-setuptools >= 30.3.0
+BuildRequires: python3-devel
+BuildRequires: python3-Cython
+BuildRequires: python3dist(numpy)
+BuildRequires: python3dist(setuptools) >= 30.3.0
 
 # runtime dependencies (required for %check and help2man)
 BuildRequires: help2man
 BuildRequires: lalapps
-BuildRequires: python%{python3_pkgversion}-h5py
-BuildRequires: python%{python3_pkgversion}-lal
-BuildRequires: python%{python3_pkgversion}-lalsimulation
-BuildRequires: python%{python3_pkgversion}-ligo-lw-bin
-BuildRequires: python%{python3_pkgversion}-lscsoft-glue
-BuildRequires: python%{python3_pkgversion}-matplotlib
-BuildRequires: python%{python3_pkgversion}-scipy
-BuildRequires: python%{python3_pkgversion}-six
+BuildRequires: python3-lal
+BuildRequires: python3-lalsimulation
+BuildRequires: python3-ligo-lw-bin
+BuildRequires: python3dist(h5py)
+BuildRequires: python3dist(lscsoft-glue)
+BuildRequires: python3dist(matplotlib)
+BuildRequires: python3dist(scipy)
+BuildRequires: python3dist(six)
 
 # testing dependencies (required for %check)
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 9
-BuildRequires: python%{python3_pkgversion}-pytest >= 3.9.1
+BuildRequires: python3dist(pytest) >= 3.9.1
 %endif
 
 # -- src rpm ----------------
@@ -72,31 +67,30 @@ template banks.
 Summary: Command-line utilities for Sbank
 BuildArch: noarch
 Requires: lalapps
-Requires: python%{python3_pkgversion}-%{srcname} = %{version}-%{release}
-Requires: python%{python3_pkgversion}-h5py
-Requires: python%{python3_pkgversion}-lal
-Requires: python%{python3_pkgversion}-lalsimulation
-Requires: python%{python3_pkgversion}-ligo-lw-bin
-Requires: python%{python3_pkgversion}-lscsoft-glue
-Requires: python%{python3_pkgversion}-matplotlib
-Requires: python%{python3_pkgversion}-numpy
-Requires: python%{python3_pkgversion}-scipy
-Requires: python%{python3_pkgversion}-six
+Requires: python3-%{srcname} = %{version}-%{release}
+Requires: python3-lal
+Requires: python3-lalsimulation
+Requires: python3-ligo-lw-bin
+Requires: python3dist(h5py)
+Requires: python3dist(lscsoft-glue)
+Requires: python3dist(matplotlib)
+Requires: python3dist(numpy)
+Requires: python3dist(scipy)
+Requires: python3dist(six)
 %description -n %{srcname}
 Sbank provides a library for generating template banks of compact binary
 mergers for gravitational-wave searches using the "stochastic" placement
 algorithm.
 The package provides the command-line utilities.
 
-%package -n python%{python3_pkgversion}-%{srcname}
+%package -n python3-%{srcname}
 Summary: Python %{python3_version} library for Sbank
-Requires: python%{python3_pkgversion}-lal
-Requires: python%{python3_pkgversion}-lalsimulation
-Requires: python%{python3_pkgversion}-lscsoft-glue
-Requires: python%{python3_pkgversion}-numpy
-Requires: python%{python3_pkgversion}-six
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-%description -n python%{python3_pkgversion}-%{srcname}
+Requires: python3-lal
+Requires: python3-lalsimulation
+Requires: python3dist(lscsoft-glue)
+Requires: python3dist(numpy)
+Requires: python3dist(six)
+%description -n python3-%{srcname}
 Sbank provides a library for generating template banks of compact binary
 mergers for gravitational-wave searches using the "stochastic" placement
 algorithm.
@@ -122,7 +116,7 @@ sbank --help
 
 %install
 %py3_install
-# generate man pages with elp2man
+# generate man pages with help2man
 mkdir -p %{buildroot}%{_mandir}/man1
 export PYTHONPATH="%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}:${PYTHONPATH}"
 ls %{buildroot}%{_bindir}/ | xargs --verbose -I @ \
@@ -135,9 +129,6 @@ help2man \
 	--version-string %{version} \
 	%{buildroot}%{_bindir}/@
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 # -- files ------------------
 
 %files -n %{srcname}
@@ -146,7 +137,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/*
 %{_mandir}/man1/*
 
-%files -n python%{python3_pkgversion}-%{srcname}
+%files -n python3-%{srcname}
 %license COPYING
 %doc README.md
 %{python3_sitearch}/*

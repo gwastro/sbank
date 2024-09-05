@@ -17,6 +17,10 @@ on:
       - main
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tarball:
     name: Tarball
@@ -25,12 +29,12 @@ jobs:
 
     steps:
       - name: Get source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -40,7 +44,7 @@ jobs:
       - name: Create distributions
         run: python -m build --outdir . --sdist .
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: tarball
           path: sbank-*.tar.*
@@ -56,14 +60,14 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     env:
       TARBALL: "sbank-*.tar.*"
     steps:
       - name: Download tarball
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: tarball
 
@@ -92,7 +96,7 @@ jobs:
           # create debian source package files
           dpkg-source --build src
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: dsc-${{ matrix.debian }}
           path: |
@@ -109,14 +113,14 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     env:
       DSC: "sbank_*.dsc"
     steps:
       - name: Download source package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: dsc-${{ matrix.debian }}
 
@@ -157,7 +161,7 @@ jobs:
               dpkg --contents "${debf}"
           done
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: deb-${{ matrix.debian }}
           path: |
@@ -174,12 +178,12 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     steps:
       - name: Download binary packages
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: deb-${{ matrix.debian }}
 
@@ -202,9 +206,9 @@ jobs:
       - debian-binary
     steps:
       - name: Download debian package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          name: deb-buster
+          name: deb-bookworm
 
       - name: Install lintian
         run: |
@@ -226,20 +230,16 @@ jobs:
       fail-fast: false
       matrix:
         el:
-          - el7-testing
+          - el8-testing
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.el }}
     env:
       TARBALL: "sbank-*.tar.*"
     steps:
       - name: Download tarball
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: tarball
-
-      - name: Configure DNF
-        if: matrix.el == 'el7-testing'
-        run: ln -s /usr/bin/yum /usr/bin/dnf
 
       - name: Configure EPEL
         run: |
@@ -249,14 +249,14 @@ jobs:
       - name: Configure rpmbuild
         run: |
           dnf -y install \
-              python-srpm-macros \
+              "*-srpm-macros" \
               rpm-build \
           ;
 
       - name: Create source package
         run: rpmbuild -ts --define "_srcrpmdir $(pwd)" ${TARBALL}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: srpm-${{ matrix.el }}
           path: "*.src.rpm"
@@ -270,54 +270,35 @@ jobs:
       fail-fast: false
       matrix:
         el:
-          - el7-testing
+          - el8-testing
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.el }}
     env:
       SRPM: "python-sbank-*.src.rpm"
     steps:
       - name: Download SRPM
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: srpm-${{ matrix.el }}
-
-      - name: Configure DNF
-        if: matrix.el == 'el7-testing'
-        run: ln -s /usr/bin/yum /usr/bin/dnf
 
       - name: Configure EPEL
         run: |
           dnf -y install epel-release
-          dnf -y install epel-rpm-macros
 
-      - name: Enable PowerTools (EL8+)
-        if: matrix.el != 'el7-testing'
+      - name: Enable PowerTools (EL8)
+        if: matrix.el == 'el8-testing'
         run: |
           dnf -y -q install "dnf-command(config-manager)"
           dnf config-manager --set-enabled powertools
 
-      - name: Install build tools (EL7)
-        if: matrix.el == 'el7-testing'
-        run: |
-          dnf -y -q install \
-              rpm-build \
-              yum-utils \
-          ;
-
-      - name: Install build tools (EL8+)
-        if: matrix.el != 'el7-testing'
+      - name: Install build tools
         run: |
           dnf -y -q install \
               rpm-build \
               "dnf-command(builddep)" \
           ;
 
-      - name: Install build dependencies (EL7)
-        if: matrix.el == 'el7-testing'
-        run: yum-builddep -y ${SRPM}
-
-      - name: Install build dependencies (EL8+)
-        if: matrix.el != 'el7-testing'
+      - name: Install build dependencies
         run: dnf builddep -y ${SRPM}
 
       - name: Build binary packages
@@ -340,7 +321,7 @@ jobs:
               rpm -qp --requires "${rpmf}"
           done
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: rpm-${{ matrix.el }}
           path: "*.rpm"
@@ -354,23 +335,18 @@ jobs:
       fail-fast: false
       matrix:
         el:
-          - el7-testing
+          - el8-testing
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.el }}
     steps:
       - name: Download RPMs
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: rpm-${{ matrix.el }}
-
-      - name: Configure DNF
-        if: matrix.el == 'el7-testing'
-        run: ln -s /usr/bin/yum /usr/bin/dnf
 
       - name: Configure EPEL
         run: |
           dnf -y install epel-release
-          dnf -y install epel-rpm-macros
 
       - name: Install RPMs
         run: dnf -y install *.rpm
@@ -378,18 +354,18 @@ jobs:
   lint-rhel:
     name: Lint RPMs
     runs-on: ubuntu-latest
-    container: centos:7
+    container: igwn/base:el8-testing
     needs:
       - rhel-binary
     steps:
       - name: Download RPM
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          name: rpm-el7-testing
+          name: rpm-el8-testing
 
       - name: Install rpmlint
         run: |
-          yum -y -q install \
+          dnf -y -q install \
               rpmlint \
           ;
 
