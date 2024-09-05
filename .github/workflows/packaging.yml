@@ -389,7 +389,7 @@ jobs:
 
       - name: Install rpmlint
         run: |
-          yum -y -q install \
+          dnf -y -q install \
               rpmlint \
           ;
 
