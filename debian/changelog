@@ -1,3 +1,9 @@
+sbank (1.0.5-1) stable; urgency=low
+  
+  * Packaging updates to prepare for numpy 2 release
+
+ -- Ian Harry <ian.harry@ligo.org>  Thu, 05 Sep 2024 18:06:00 +0000
+
 sbank (1.0.4-1) stable; urgency=low
   
   * Actually get release right
