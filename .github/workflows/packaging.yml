@@ -60,7 +60,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     env:
@@ -113,7 +113,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     env:
@@ -178,7 +178,7 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - buster
+          - bookworm
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.debian }}
     steps:
@@ -208,7 +208,7 @@ jobs:
       - name: Download debian package
         uses: actions/download-artifact@v4
         with:
-          name: deb-buster
+          name: deb-bookworm
 
       - name: Install lintian
         run: |
