@@ -7,7 +7,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/1488c7bc13b82b49661d/maintainability)](https://codeclimate.com/github/gwastro/sbank/maintainability)
 [![Coverage status](https://codecov.io/gh/gwastro/sbank/branch/master/graph/badge.svg)](https://codecov.io/gh/gwastro/sbank)
 
-Sbank is a library for generating a template bank for compact binary searches
+Sbank is a library for generating a template bank for compact binary gravitational wave searches
 covering a given region of mass and spin parameter space.
 The program can support all waveform approximants available in the
 lalsimulation suite. Currently implemented waveforms can be found with
