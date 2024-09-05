@@ -226,7 +226,7 @@ jobs:
       fail-fast: false
       matrix:
         el:
-          - el7-testing
+          - el8-testing
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.el }}
     env:
@@ -354,7 +354,7 @@ jobs:
       fail-fast: false
       matrix:
         el:
-          - el7-testing
+          - el8-testing
     runs-on: ubuntu-latest
     container: igwn/base:${{ matrix.el }}
     steps:
