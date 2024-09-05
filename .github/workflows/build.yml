@@ -18,6 +18,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   conda:
     name: Python ${{ matrix.python-version }} (${{ matrix.os }})
