@@ -378,7 +378,7 @@ jobs:
   lint-rhel:
     name: Lint RPMs
     runs-on: ubuntu-latest
-    container: centos:8
+    container: rockylinux:8
     needs:
       - rhel-binary
     steps:
