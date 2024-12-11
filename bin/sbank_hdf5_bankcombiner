@@ -69,7 +69,8 @@ for i, file_name in enumerate(args.input_filenames):
     if items_dict is None:
         items_dict = {}
         for item, entries in hdf_fp.items():
-            items_dict[item] = numpy.array([])
+            dt = entries.dtype if hasattr(entries, "dtype") else None
+            items_dict[item] = numpy.array([], dtype=dt)
     else:
         curr_items = set(items_dict.keys())
         new_items = set(hdf_fp.keys())
