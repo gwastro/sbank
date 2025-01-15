@@ -1,5 +1,5 @@
 %define srcname sbank
-%define version 1.0.5
+%define version 1.0.6
 %define release 1
 
 # -- src.rpm metadata -------
