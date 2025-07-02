@@ -77,7 +77,7 @@ jobs:
             c-compiler \
             coverage \
             cython \
-            lalsuite \
+            lalsuite=7.26 \
             numpy \
             pip \
             setuptools \
