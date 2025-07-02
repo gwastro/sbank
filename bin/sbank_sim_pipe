@@ -33,7 +33,7 @@ try:
     from glue import pipeline
     from lalapps.inspiral import InspiralAnalysisJob
 except ImportError:
-    logging.warn(
+    logging.warning(
         "sbank_pipe requires the inspiral.py module from lalapps, which was "
         "removed from lalsuite in Spring 2025. If seeing this message you "
         "likely have code versions that don't have this module and so this "

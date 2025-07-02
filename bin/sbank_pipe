@@ -38,7 +38,7 @@ try:
     from glue import pipeline
     from lalapps.inspiral import InspiralAnalysisJob
 except ImportError:
-    logging.warn(
+    logging.warning(
         "sbank_pipe requires the inspiral.py module from lalapps, which was "
         "removed from lalsuite in Spring 2025. If seeing this message you "
         "likely have code versions that don't have this module and so this "
@@ -179,9 +179,11 @@ class LWAddJob(pipeline.CondorDAGJob):
     A ligolw_add node. This node is used to combine the split template banks
     into one aggregate bank.
     """
-    def __init__(self, cp, executable=which('ligolw_add'), tag_base='ligolw_add'):
+    def __init__(self, cp, executable=None, tag_base='ligolw_add'):
         """
         """
+        if executable == None:
+            executable = which('ligolw_add')
         self.__prog__ = 'ligolw_add'
         self.__executable = executable
         self.__universe = 'vanilla'
