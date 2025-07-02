@@ -37,7 +37,6 @@ from sbank.bank import Bank
 from sbank.waveforms import waveforms
 from sbank.psds import noise_models, read_psd
 
-@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
 
@@ -135,12 +134,13 @@ if opts.use_gpu_match:
 fake_xmldoc = ligolw.Document()
 fake_xmldoc.appendChild(ligolw.LIGO_LW())
 opts_dict = dict((k, v) for k, v in opts.__dict__.iteritems() if v is not False and v is not None)
-#process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim", FIXME
-#    opts_dict, version=git_version.tag or git_version.id, FIXME
-#    cvs_repository="sbank", cvs_entry_time=git_version.date) FIXME
-process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim",
-    opts_dict, version="no version",
-    cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
+fake_xmldoc.register_process(
+    "sbank_sim",
+    opts_dict,
+    version="no version",
+    cvs_repository="sbank",
+    cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +0000'),
+)
 
 # load templates
 #

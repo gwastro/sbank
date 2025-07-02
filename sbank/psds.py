@@ -155,11 +155,16 @@ def psd_instrument_dict(elem):
     return out
 
 
-def read_psd(filename, verbose=False):
-    return psd_instrument_dict(
-        ligolw_utils.load_filename(
-            filename,
-            verbose=verbose,
-            contenthandler=lalseries.PSDContentHandler
+def read_psd(filename, root_name='psd'):
+    with open(filename, 'rb') as fp:
+        ct_handler = lal.series.PSDContentHandler
+        xml_doc = ligolw_utils.load_fileobj(
+            fp,
+            compress='auto',
+            contenthandler=ct_handler
         )
-    )
+        psd_dict = lalseries.read_psd_xmldoc(
+            xml_doc,
+            root_name=root_name,
+        )
+    return psd_dict

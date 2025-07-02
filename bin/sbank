@@ -44,7 +44,6 @@ from sbank.psds import (noise_models, read_psd)
 from sbank.waveforms import waveforms, SnglInspiralTable
 
 
-@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
 
@@ -441,7 +440,7 @@ else:
         xmldoc = ligolw.Document()
         xmldoc.appendChild(ligolw.LIGO_LW())
         lsctables.SnglInspiralTable.RowType = SnglInspiralTable
-        tbl = lsctables.New(lsctables.SnglInspiralTable)
+        tbl = lsctables.SnglInspiralTable.new()
         xmldoc.childNodes[-1].appendChild(tbl)
     elif opts.output_filename.endswith(('.hdf', '.h5', '.hdf5')):
         # No setup is required for HDF files
@@ -461,10 +460,13 @@ else:
 opts_dict = dict((k, v) for k, v in opts.__dict__.items()
                  if v is not False and v is not None)
 if opts.output_filename.endswith(('.xml', '.xml.gz')):
-    process = ligolw_process.register_to_xmldoc(xmldoc, "sbank",
-        opts_dict, version="no version",
+    process = xmldoc.register_process(
+        "sbank",
+        opts_dict,
+        version="no version",
         cvs_repository="sbank",
-        cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +0000'))
+        cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +0000'),
+    )
 
 
 #
