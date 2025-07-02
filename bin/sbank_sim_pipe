@@ -40,7 +40,7 @@ except ImportError:
         "code will not run. Alternatives exist, for example PyCBC provides "
         "a workflow generator for sbank using pegasus."
     )
-    InspiralAnalysisJob = None
+    InspiralAnalysisJob = object
 
 
 ###############################################################################

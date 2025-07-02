@@ -46,7 +46,7 @@ except ImportError:
         "a workflow generator for sbank using pegasus."
     )
     # Hack to avoid failures if running with --help
-    InspiralAnalysisJob = None
+    InspiralAnalysisJob = object
 
 def which(prog):
     out = shutil.which(prog)
