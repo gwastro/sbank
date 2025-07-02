@@ -33,10 +33,10 @@ jobs:
           - macOS
           - Ubuntu
         python-version:
-          - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
     runs-on: ${{ matrix.os }}-latest
 
     # this is needed for conda environments to activate automatically
