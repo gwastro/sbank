@@ -71,7 +71,7 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        conda install --yes \
+        conda install --quiet --yes \
             c-compiler \
             coverage \
             cython \

@@ -183,7 +183,7 @@ class LWAddJob(pipeline.CondorDAGJob):
         """
         """
         if executable == None:
-            executable = which('ligolw_add')
+            executable = which('igwn_ligolw_add')
         self.__prog__ = 'ligolw_add'
         self.__executable = executable
         self.__universe = 'vanilla'
