@@ -27,14 +27,24 @@ import socket
 import sys
 import tempfile
 import shutil
+import logging
 
 ##############################################################################
 # import the modules we need to build the pipeline
 from optparse import OptionParser
-from glue.pipeline import DeepCopyableConfigParser as dcConfigParser
 
-from glue import pipeline
-from lalapps import inspiral
+try:
+    from glue.pipeline import DeepCopyableConfigParser as dcConfigParser
+    from glue import pipeline
+    from lalapps import inspiral
+except ImportError:
+    logging.warn(
+        "sbank_pipe requires the inspiral.py module from lalapps, which was "
+        "removed from lalsuite in Spring 2025. If seeing this message you "
+        "likely have code versions that don't have this module and so this "
+        "code will not run. Alternatives exist, for example PyCBC provides "
+        "a workflow generator for sbank using pegasus."
+    )
 
 def which(prog):
     out = shutil.which(prog)
