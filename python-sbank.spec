@@ -32,7 +32,6 @@ BuildRequires: help2man
 BuildRequires: lalapps
 BuildRequires: python3-lal
 BuildRequires: python3-lalsimulation
-BuildRequires: python3-ligo-lw-bin
 BuildRequires: python3dist(h5py)
 BuildRequires: python3dist(lscsoft-glue)
 BuildRequires: python3dist(matplotlib)
@@ -70,7 +69,6 @@ Requires: lalapps
 Requires: python3-%{srcname} = %{version}-%{release}
 Requires: python3-lal
 Requires: python3-lalsimulation
-Requires: python3-ligo-lw-bin
 Requires: python3dist(h5py)
 Requires: python3dist(lscsoft-glue)
 Requires: python3dist(matplotlib)
