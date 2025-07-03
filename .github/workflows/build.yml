@@ -65,22 +65,19 @@ jobs:
         activate-environment: test
         channels: conda-forge
         python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true
 
     - name: Conda info
       run: conda info --all
 
     - name: Install build dependencies
       run: |
-        conda install --quiet --yes \
-            c-compiler \
-            coverage \
-            cython \
-            "lalsuite" \
-            numpy \
-            pip \
-            setuptools \
-        ;
+        conda install --quiet --yes c-compiler;
+        conda install --quiet --yes coverage;
+        conda install --quiet --yes cython;
+        conda install --quiet --yes lalsuite;
+        conda install --quiet --yes numpy;
+        conda install --quiet --yes pip;
+        conda install --quiet --yes setuptools;
         python -m pip install -r requirements.txt
 
     - name: Install SBank
