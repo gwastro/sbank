@@ -33,10 +33,10 @@ jobs:
           - macOS
           - Ubuntu
         python-version:
-          - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
     runs-on: ${{ matrix.os }}-latest
 
     # this is needed for conda environments to activate automatically
@@ -65,16 +65,18 @@ jobs:
         activate-environment: test
         channels: conda-forge
         python-version: ${{ matrix.python-version }}
-        # this is needed for caching to work properly:
-        use-only-tar-bz2: true
 
     - name: Conda info
       run: conda info --all
 
     - name: Install build dependencies
       run: |
+        # NOTE: C-compiler was pinned because newer versions were causing
+        #       failures on github's Actions with the Ubuntu runner. Cause of
+        #       the failures is unknown, so might be worth trying unpinning
+        #       this in the future.
         conda install --quiet --yes \
-            c-compiler \
+            "c-compiler=1.5.1" \
             coverage \
             cython \
             lalsuite \

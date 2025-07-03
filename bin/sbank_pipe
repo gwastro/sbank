@@ -27,14 +27,26 @@ import socket
 import sys
 import tempfile
 import shutil
+import logging
 
 ##############################################################################
 # import the modules we need to build the pipeline
 from optparse import OptionParser
-from glue.pipeline import DeepCopyableConfigParser as dcConfigParser
 
-from glue import pipeline
-from lalapps import inspiral
+try:
+    from glue.pipeline import DeepCopyableConfigParser as dcConfigParser
+    from glue import pipeline
+    from lalapps.inspiral import InspiralAnalysisJob
+except ImportError:
+    logging.warning(
+        "sbank_pipe requires the inspiral.py module from lalapps, which was "
+        "removed from lalsuite in Spring 2025. If seeing this message you "
+        "likely have code versions that don't have this module and so this "
+        "code will not run. Alternatives exist, for example PyCBC provides "
+        "a workflow generator for sbank using pegasus."
+    )
+    # Hack to avoid failures if running with --help
+    InspiralAnalysisJob = object
 
 def which(prog):
     out = shutil.which(prog)
@@ -83,12 +95,12 @@ class bank_DAG(pipeline.CondorDAG):
         f.close()
 
 
-class SBankJob(inspiral.InspiralAnalysisJob):
+class SBankJob(InspiralAnalysisJob):
     def __init__(self,cp, tag_base="sbank"):
         exec_name = 'sbank'
         extension = 'xml'
         sections = ['sbank']
-        inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension)
+        InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension)
         self.tag_base = tag_base
         self.set_sub_file(tag_base+'.sub')
         self.set_stdout_file('logs/'+tag_base+'-$(macroid)-$(process).out')
@@ -125,12 +137,12 @@ class SBankNode(pipeline.CondorDAGNode):
         dag.add_node(self)
 
 
-class SBankChooseMchirpBoundariesJob(inspiral.InspiralAnalysisJob):
+class SBankChooseMchirpBoundariesJob(InspiralAnalysisJob):
     def __init__(self,cp, tag_base="sbank_choose_mchirp_boundaries"):
         exec_name = 'sbank_choose_mchirp_boundaries'
         extension = 'txt'
         sections = ['split']
-        inspiral.InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension)
+        InspiralAnalysisJob.__init__(self,cp,sections,exec_name,extension)
         self.set_universe("local")
         self.set_sub_file(tag_base+'.sub')
         self.tag_base = tag_base
@@ -167,9 +179,11 @@ class LWAddJob(pipeline.CondorDAGJob):
     A ligolw_add node. This node is used to combine the split template banks
     into one aggregate bank.
     """
-    def __init__(self, cp, executable=which('ligolw_add'), tag_base='ligolw_add'):
+    def __init__(self, cp, executable=None, tag_base='ligolw_add'):
         """
         """
+        if executable == None:
+            executable = which('igwn_ligolw_add')
         self.__prog__ = 'ligolw_add'
         self.__executable = executable
         self.__universe = 'vanilla'

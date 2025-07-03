@@ -25,7 +25,7 @@ import lal
 import lalsimulation as lalsim
 from lal import MSUN_SI, MTSUN_SI, PC_SI, PI
 from lal import CreateREAL8Vector, CreateCOMPLEX8FrequencySeries
-from ligo.lw.lsctables import SnglInspiralTable as llwsit
+from igwn_ligolw.lsctables import SnglInspiralTable as llwsit
 
 from .overlap import SBankComputeMatchSkyLoc, SBankComputeMatch
 from .psds import get_neighborhood_PSD, get_ASD

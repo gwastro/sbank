@@ -7,6 +7,6 @@ h5py
 lalsuite
 lscsoft-glue
 matplotlib
-python-ligo-lw
+igwn-ligolw
 scipy
 six

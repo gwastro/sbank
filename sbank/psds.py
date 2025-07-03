@@ -23,7 +23,7 @@ import lalsimulation as lalsim
 import lal
 from lal import series as lalseries
 
-from ligo.lw import (param, utils)
+from igwn_ligolw import utils as ligolw_utils
 
 seterr(over="ignore")  # the PSD overflows frequently, but that's OK
 
@@ -142,19 +142,16 @@ def get_neighborhood_ASD(waveforms, flow, noise_model):
 #
 
 
-def psd_instrument_dict(elem):
-    out = {}
-    for lw in elem.getElementsByTagName(u"LIGO_LW"):
-        if not lw.hasAttribute(u"Name"):
-            continue
-        if lw.getAttribute(u"Name") != u"REAL8FrequencySeries":
-            continue
-        ifo = param.get_pyvalue(lw, u"instrument")
-        out[ifo] = lalseries.parse_REAL8FrequencySeries(lw)
-    return out
-
-
-def read_psd(filename, verbose=False):
-    return psd_instrument_dict(
-        utils.load_filename(filename, verbose=verbose, contenthandler=lalseries.PSDContentHandler),
-    )
+def read_psd(filename, root_name='psd'):
+    with open(filename, 'rb') as fp:
+        ct_handler = lal.series.PSDContentHandler
+        xml_doc = ligolw_utils.load_fileobj(
+            fp,
+            compress='auto',
+            contenthandler=ct_handler
+        )
+        psd_dict = lalseries.read_psd_xmldoc(
+            xml_doc,
+            root_name=root_name,
+        )
+    return psd_dict

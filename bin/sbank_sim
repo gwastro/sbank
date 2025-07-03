@@ -27,8 +27,8 @@ import numpy as np
 from h5py import File as H5File
 
 from scipy.interpolate import UnivariateSpline
-from ligo.lw import (ligolw, lsctables, utils)
-from ligo.lw.utils import (ligolw_add, process as ligolw_process)
+from igwn_ligolw import (ligolw, lsctables, utils as ligolw_utils)
+from igwn_ligolw.utils import ligolw_add
 
 import lalsimulation as lalsim
 from lal import MSUN_SI
@@ -37,13 +37,12 @@ from sbank.bank import Bank
 from sbank.waveforms import waveforms
 from sbank.psds import noise_models, read_psd
 
-@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
 
 def ligolw_table_to_array(tab):
     # get mapping of LIGO_LW types to numpy numeric types; add string types
-    from ligo.lw.types import ToNumPyType
+    from igwn_ligolw.types import ToNumPyType
     type_map = ToNumPyType.copy()
     type_map[u"ilwd:char"] = "S40"
     type_map[u"lstring"] = "S32"
@@ -135,12 +134,13 @@ if opts.use_gpu_match:
 fake_xmldoc = ligolw.Document()
 fake_xmldoc.appendChild(ligolw.LIGO_LW())
 opts_dict = dict((k, v) for k, v in opts.__dict__.iteritems() if v is not False and v is not None)
-#process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim", FIXME
-#    opts_dict, version=git_version.tag or git_version.id, FIXME
-#    cvs_repository="sbank", cvs_entry_time=git_version.date) FIXME
-process = ligolw_process.register_to_xmldoc(fake_xmldoc, "sbank_sim",
-    opts_dict, version="no version",
-    cvs_repository="sbank", cvs_entry_time=strftime('%Y/%m/%d %H:%M:%S'))
+fake_xmldoc.register_process(
+    "sbank_sim",
+    opts_dict,
+    version="no version",
+    cvs_repository="sbank",
+    cvs_entry_time=strftime('%Y-%m-%d %H:%M:%S +0000'),
+)
 
 # load templates
 #
@@ -158,7 +158,7 @@ for file_approx in opts.template_bank:
         seed_file, approx = file_approx.split(":")
 
     # add templates to bank
-    tmpdoc = utils.load_filename(seed_file, contenthandler=ContentHandler)
+    tmpdoc = ligolw_utils.load_filename(seed_file, contenthandler=ContentHandler)
     sngl_inspiral = lsctables.SnglInspiralTable.get_table(tmpdoc)
     seed_waveform = waveforms[approx]
     bank.add_from_sngls(sngl_inspiral, seed_waveform)
@@ -178,7 +178,7 @@ if opts.verbose:
 # chirp mass helps avoid memory usage going off the rails when using
 # waveform caching
 #
-xmldoc2 = utils.load_filename(inj_file, contenthandler=ContentHandler)
+xmldoc2 = ligolw_utils.load_filename(inj_file, contenthandler=ContentHandler)
 ligolw_copy_process(xmldoc2, fake_xmldoc)
 sims = sorted(lsctables.SimInspiralTable.get_table(xmldoc2), key=lambda s: s.mchirp)
 

@@ -34,10 +34,9 @@ from optparse import OptionParser
 
 import numpy
 
-from ligo.lw import (ligolw, lsctables, utils)
+from igwn_ligolw import (ligolw, lsctables, utils)
 
 
-@lsctables.use_in
 class ContentHandler(ligolw.LIGOLWContentHandler):
     pass
 
