@@ -24,7 +24,6 @@ import lal
 from lal import series as lalseries
 
 from igwn_ligolw import utils as ligolw_utils
-from igwn_ligolw.ligolw import Param
 
 seterr(over="ignore")  # the PSD overflows frequently, but that's OK
 
