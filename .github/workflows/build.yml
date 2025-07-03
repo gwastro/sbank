@@ -79,7 +79,7 @@ jobs:
             "c-compiler=1.5.1" \
             coverage \
             cython \
-            "lalsuite" \
+            lalsuite \
             numpy \
             pip \
             setuptools \

@@ -28,7 +28,7 @@ from h5py import File as H5File
 
 from scipy.interpolate import UnivariateSpline
 from igwn_ligolw import (ligolw, lsctables, utils as ligolw_utils)
-from igwn_ligolw.utils import (ligolw_add, process as ligolw_process)
+from igwn_ligolw.utils import ligolw_add
 
 import lalsimulation as lalsim
 from lal import MSUN_SI

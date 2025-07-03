@@ -143,18 +143,6 @@ def get_neighborhood_ASD(waveforms, flow, noise_model):
 #
 
 
-def psd_instrument_dict(elem):
-    out = {}
-    for lw in elem.getElementsByTagName(u"LIGO_LW"):
-        if not lw.hasAttribute(u"Name"):
-            continue
-        if lw.getAttribute(u"Name") != u"REAL8FrequencySeries":
-            continue
-        ifo = Param.get_pyvalue(lw, u"instrument")
-        out[ifo] = lalseries.parse_REAL8FrequencySeries(lw)
-    return out
-
-
 def read_psd(filename, root_name='psd'):
     with open(filename, 'rb') as fp:
         ct_handler = lal.series.PSDContentHandler

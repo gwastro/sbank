@@ -35,7 +35,6 @@ from scipy.interpolate import UnivariateSpline
 from igwn_ligolw import ligolw
 from igwn_ligolw import lsctables
 from igwn_ligolw import utils as ligolw_utils
-from igwn_ligolw.utils import process as ligolw_process
 
 #from sbank import git_version FIXME
 from sbank.bank import Bank
