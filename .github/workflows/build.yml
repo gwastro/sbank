@@ -71,7 +71,7 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        conda install --quiet --yes c-compiler;
+        conda install --quiet --yes "c-compiler=1.5.1";
         conda install --quiet --yes coverage;
         conda install --quiet --yes cython;
         conda install --quiet --yes lalsuite;
