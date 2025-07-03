@@ -65,6 +65,7 @@ jobs:
         activate-environment: test
         channels: conda-forge
         python-version: ${{ matrix.python-version }}
+        use-only-tar-bz2: true
 
     - name: Conda info
       run: conda info --all
@@ -75,7 +76,7 @@ jobs:
             c-compiler \
             coverage \
             cython \
-            "lalsuite<=7.11" \
+            "lalsuite" \
             numpy \
             pip \
             setuptools \
