@@ -71,11 +71,11 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        conda install -vvvv --yes \
+        conda install --quiet --yes \
             c-compiler \
             coverage \
             cython \
-            "lalsuite<=7.25" \
+            "lalsuite<=7.11" \
             numpy \
             pip \
             setuptools \
